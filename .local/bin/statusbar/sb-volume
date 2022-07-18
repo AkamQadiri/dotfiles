@@ -1,0 +1,12 @@
+#!/bin/sh
+
+case $BUTTON in
+	2) "$TERMINAL" -e "$EDITOR" "$0";;
+esac
+
+audio_info=$(pactl list sinks); 
+audio_muted=$(awk '$1=="Mute:" {print $2}' <<< $audio_info); 
+audio_volume=$(awk '$1=="Volume:" {print $5}' <<< $audio_info); 
+audio_icon="\uf028"; [ "$audio_muted" = "yes" ] && audio_icon="\uf6a9"; 
+
+printf "$audio_icon $audio_volume%\n";
