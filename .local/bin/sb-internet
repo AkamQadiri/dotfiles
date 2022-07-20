@@ -4,8 +4,9 @@
 # Show 🌐 if connected to ethernet or ❎ if none.
 # Show 🔒 if a vpn connection is active
 
-case $BUTTON in
-	2) "$TERMINAL" -e "$EDITOR" "$0";;
+case $BLOCK_BUTTON in
+	1) "$TERMINAL" -e nmtui; pkill -RTMIN+26 dwmblocks ;;
+	2) "$TERMINAL" -e "$EDITOR" "$0" ;;
 esac
 
 if grep -xq 'up' /sys/class/net/w*/operstate 2>/dev/null ; then

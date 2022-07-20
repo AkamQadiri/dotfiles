@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# Status bar module for disk space
+# $1 should be drive mountpoint, otherwise assumed /.
+
+location=${1:-/}
+
+[ -d "$location" ] || exit
+
+case $BLOCK_BUTTON in
+	2) "$TERMINAL" -e "$EDITOR" "$0" ;;
+esac
+
+case "$location" in
+	"/home"* ) icon="\uf015" ;;
+	"/mnt"* ) icon="\uf0c7" ;;
+	*) icon="\ue4e5";;
+esac
+
+printf "$icon %s\n" "$(df -h "$location" | awk ' /[0-9]/ {print $3 "/" $2}')"

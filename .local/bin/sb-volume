@@ -1,12 +1,23 @@
 #!/bin/sh
 
-case $BUTTON in
-	2) "$TERMINAL" -e "$EDITOR" "$0";;
+case $BLOCK_BUTTON in
+	2) "$TERMINAL" -e "$EDITOR" "$0" ;;
+	4) pactl set-sink-volume @DEFAULT_SINK@ +1% ;;
+	5) pactl set-sink-volume @DEFAULT_SINK@ -1% ;;
 esac
 
 audio_info=$(pactl list sinks); 
 audio_muted=$(awk '$1=="Mute:" {print $2}' <<< $audio_info); 
-audio_volume=$(awk '$1=="Volume:" {print $5}' <<< $audio_info); 
-audio_icon="\uf028"; [ "$audio_muted" = "yes" ] && audio_icon="\uf6a9"; 
+audio_volume=$(echo $(awk '$1=="Volume:" {print $5}' <<< $audio_info) | sed 's/%,//');
 
-printf "$audio_icon $audio_volume%\n";
+if [ "$audio_volume" -gt "70" ]; then
+	audio_icon="\uf028"
+elif [ "$audio_volume" -gt "30" ]; then
+	audio_icon="\uf027"
+elif [ "$audio_volume" -gt "0" ]; then
+	audio_icon="\uf026"
+fi
+
+[ "$audio_muted" = "yes" ] && audio_icon="\uf6a9"
+
+echo -e "$audio_icon $audio_volume%";

@@ -4,6 +4,5 @@ case $BLOCK_BUTTON in
 	2) "$TERMINAL" -e "$EDITOR" "$0" ;;
 esac
 
-printf "\uf538 ";
-
-free -h | awk '/^Mem/ { print $3"/"$2 }' | sed s/i//g
+printf "\uf2c9 "
+sensors | awk '/Core 0/ {print $3}'
