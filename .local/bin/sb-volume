@@ -8,7 +8,7 @@ esac
 
 audio_info=$(pactl list sinks); 
 audio_muted=$(awk '$1=="Mute:" {print $2}' <<< $audio_info); 
-audio_volume=$(echo $(awk '$1=="Volume:" {print $5}' <<< $audio_info) | sed 's/%,//');
+audio_volume=$(echo $(awk '$1=="Volume:" {print $5}' <<< $audio_info) | sed 's/%//' | sed 's/,//' );
 
 if [ "$audio_volume" -gt "70" ]; then
 	audio_icon="\uf028"
@@ -16,6 +16,8 @@ elif [ "$audio_volume" -gt "30" ]; then
 	audio_icon="\uf027"
 elif [ "$audio_volume" -gt "0" ]; then
 	audio_icon="\uf026"
+else
+	audio_icon="\uf6a9"
 fi
 
 [ "$audio_muted" = "yes" ] && audio_icon="\uf6a9"
