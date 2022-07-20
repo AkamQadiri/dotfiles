@@ -9,7 +9,7 @@ PS1='[\u@\h \W]\$ '
 
 export TERMINAL="st"
 export EDITOR="vim"
-export PATH="/usr/bin/statusbar:$PATH"
+export PATH="${PATH}:${HOME}/.local/bin/"
 
 (cat ~/.cache/wal/sequences &) #Set terminal theme from pywal generated file
 source ~/.cache/wal/colors-tty.sh #Set tty theme from pywal generated file
