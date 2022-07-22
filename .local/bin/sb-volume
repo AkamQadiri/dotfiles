@@ -9,7 +9,7 @@ esac
 
 audio_info=$(pactl list sinks); 
 audio_muted=$(awk '$1=="Mute:" {print $2}' <<< $audio_info); 
-audio_volume=$(echo $(awk '$1=="Volume:" {print $5}' <<< $audio_info) | sed 's/%//' | sed 's/,//' );
+audio_volume=$(echo $(awk '$1=="Volume:" {print $5}' <<< $audio_info) | sed 's/[^0-9]//g');
 
 if [ "$audio_volume" -gt "70" ]; then
 	audio_icon="\uf028"
