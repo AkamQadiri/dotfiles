@@ -14,9 +14,9 @@ sudo sh -c 'echo "" >> /etc/profile'
 sudo sh -c 'echo "wal -i ~/wallpapers -steq" >> /etc/profile'
 
 #Make local binaries executable
-chmod u+x $USERHOME/.local/bin/*
+chmod u+x ~/.local/bin/*
 
 #Cleanup
-sudo rm -r $USERHOME/.git
-sudo rm -r $USERHOME/setup
-sudo rm -r $USERHOME/setup_dotfiles.sh
+rm -rf ~/.git
+rm -rf ~/setup
+rm -rf ~/setup_dotfiles.sh
