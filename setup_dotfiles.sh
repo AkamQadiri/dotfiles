@@ -13,7 +13,7 @@ sudo sh -c 'echo "" >> /etc/profile'
 sudo sh -c 'echo "wal -i ~/wallpapers -steq" >> /etc/profile'
 
 #Make local binaries executable
-sudo chmod u+x $USERHOME/.local/bin/*
+chmod u+x $USERHOME/.local/bin/*
 
 #Cleanup
 sudo rm -r $USERHOME/.git
