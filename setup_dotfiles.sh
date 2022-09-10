@@ -1,5 +1,6 @@
 #!/bin/sh
 
+#Setup variables
 USERHOME=$HOME
 
 #Copy files to home directory
