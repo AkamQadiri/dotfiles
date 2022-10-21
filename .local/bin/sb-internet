@@ -4,9 +4,20 @@
 # Show 🌐 if connected to ethernet or ❎ if none.
 # Show 🔒 if a vpn connection is active
 
+toggle_rf () {
+	rf_status=$(rfkill -ro Soft list wlan | grep "blocked")
+    if [[ "$rf_status" == "unblocked" ]]; then
+		rfkill block all;
+	else
+		rfkill unblock all;
+	fi
+	"$TERMINAL" -e pkill -RTMIN+26 dwmblocks
+}
+
 case $BLOCK_BUTTON in
 	1) "$TERMINAL" -e nmtui; pkill -RTMIN+26 dwmblocks ;;
 	2) "$TERMINAL" -e "$EDITOR" "$0" ;;
+	3) toggle_rf ;;
 esac
 
 if grep -xq 'up' /sys/class/net/w*/operstate 2>/dev/null ; then
