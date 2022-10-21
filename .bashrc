@@ -7,7 +7,7 @@
 
 PS1='[\u@\h \W]\$ '
 
-(cat ~/.cache/wal/sequences &) #Set terminal theme from pywal generated file
+(cat ~/.cache/wal/sequences &)    #Set terminal theme from pywal generated file
 source ~/.cache/wal/colors-tty.sh #Set tty theme from pywal generated file
 
 export PATH="${PATH}:${HOME}/.local/bin/"

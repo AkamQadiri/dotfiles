@@ -74,3 +74,15 @@ dwm.normfgcolor: {color15}
 dwm.selbordercolor: {color2}
 dwm.selbgcolor: {color2}
 dwm.selfgcolor: {color15}
+
+! dmenu colors.
+dmenu.background: {color0}
+dmenu.foreground: {color15}
+dmenu.selbackground: {color2}
+dmenu.selforeground: {color15}
+
+! slock colors.
+slock.init: {color0}
+slock.input: {color0}
+slock.failed: {color1}
+slock.caps: {color3}
