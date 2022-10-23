@@ -1,13 +1,10 @@
 #!/bin/sh
 
-#Setup variables
-USERHOME=$HOME
-
 #Copy files to home directory
-cp -a $PWD/. $USERHOME
+cp -a $PWD/. $HOME
 
-#Copy setup files
-sudo cp $USERHOME/setup/xorg.conf.d/* /etc/X11/xorg.conf.d/
+#Copy setup files to destinations
+sudo cp $HOME/setup/xorg.conf.d/* /etc/X11/xorg.conf.d/
 
 #Setup profile
 sudo sh -c 'echo "" >> /etc/profile'
