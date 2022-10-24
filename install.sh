@@ -16,4 +16,4 @@ chmod u+x ~/.local/bin/*
 #Cleanup
 rm -rf ~/.git
 rm -rf ~/setup
-rm -rf ~/setup_dotfiles.sh
+rm -rf ~/install.sh
