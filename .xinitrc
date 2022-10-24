@@ -1,6 +1,6 @@
 xrandr --auto
 
-wal -Rstq #Set background and theme from cache with pywal
+wal -stq -i ~/wallpapers #Set background and colorscheme
 picom &
 dwmblocks &
 exec dwm
