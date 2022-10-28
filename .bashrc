@@ -7,6 +7,8 @@
 
 PS1='[\u@\h \W]\$ '
 
+source ~/.cache/wal/colors-tty.sh #Set tty theme from pywal generated file
+
 export PATH="${PATH}:${HOME}/.local/bin/"
 export HISTCONTROL=ignoreboth:erasedups
 export TERMINAL="st"
