@@ -7,4 +7,4 @@ picom &
 unclutter &
 lxpolkit &
 dwmblocks &
-exec dwm &> /var/log/dwm.log
+exec dwm
