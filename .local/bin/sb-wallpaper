@@ -1,0 +1,8 @@
+#!/bin/sh
+
+case $BLOCK_BUTTON in
+	1) wal -i ~/wallpapers -stq ;;
+	2) "$TERMINAL" -e "$EDITOR" "$0" ;;
+esac
+
+printf "\uf302\n"
