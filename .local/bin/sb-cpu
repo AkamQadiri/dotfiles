@@ -5,4 +5,4 @@ case $BLOCK_BUTTON in
 esac
 
 printf "\uf2c9 "
-sensors | awk '/Core 0/ {print $3}'
+sensors | awk '/Package id 0/ {print $4+0"°C"}'
