@@ -13,7 +13,6 @@ export PATH="${PATH}:${HOME}/.local/bin/"
 export HISTCONTROL='ignoreboth:erasedups'
 export TERMINAL='st'
 export EDITOR='vim'
-export NNN_FIFO='/tmp/nnn.fifo'
 export NNN_PLUG='p:preview-tabbed;'
 
 alias nnn=n
@@ -46,7 +45,7 @@ n ()
 
     # The backslash allows one to alias n to nnn if desired without making an
     # infinitely recursive alias
-    \nnn "$@"
+    \nnn -a "$@"
 
     if [ -f "$NNN_TMPFILE" ]; then
             . "$NNN_TMPFILE"
