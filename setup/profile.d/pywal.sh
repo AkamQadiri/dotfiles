@@ -1,3 +1,3 @@
 #!/bin/sh
 
-wal -i ~/wallpapers -steq" >> /etc/profile
+wal -i ~/wallpapers -steq
