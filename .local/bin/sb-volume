@@ -14,15 +14,15 @@ audio_muted=$(awk '$1=="Mute:" {print $2}' <<< $pactl_muted);
 audio_volume=$(echo $(awk '$1=="Volume:" {print $5}' <<< $pactl_volume) | sed 's/[^0-9]//g');
 
 if [ "$audio_volume" -gt "70" ]; then
-	audio_icon="\uf028"
+	audio_icon=""
 elif [ "$audio_volume" -gt "30" ]; then
-	audio_icon="\uf027"
+	audio_icon=""
 elif [ "$audio_volume" -gt "0" ]; then
-	audio_icon="\uf026"
+	audio_icon=""
 else
-	audio_icon="\uf6a9"
+	audio_icon=""
 fi
 
-[ "$audio_muted" = "yes" ] && audio_icon="\uf6a9"
+[ "$audio_muted" = "yes" ] && audio_icon=""
 
-echo -e "$audio_icon $audio_volume%";
+echo "$audio_icon $audio_volume%";
