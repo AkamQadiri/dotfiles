@@ -5,11 +5,11 @@
 # Show  if a vpn connection is active
 
 toggle_rf () {
-	rf_status=$(rfkill -ro Soft list wlan | grep "blocked");
+	rf_status=$(rfkill -ro Soft list wlan | grep "blocked")
 	if [[ "$rf_status" == "unblocked" ]]; then
-		rfkill block all;
+		rfkill block all
 	else
-		rfkill unblock all;
+		rfkill unblock all
 	fi
 }
 
