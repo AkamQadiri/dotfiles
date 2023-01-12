@@ -8,10 +8,10 @@ case $BLOCK_BUTTON in
 	5) pactl set-sink-mute @DEFAULT_SINK@ 0; pactl set-sink-volume @DEFAULT_SINK@ -1% ;;
 esac
 
-pactl_muted=$(pactl get-sink-mute @DEFAULT_SINK@);
-pactl_volume=$(pactl get-sink-volume @DEFAULT_SINK@);
-audio_muted=$(awk '$1=="Mute:" {print $2}' <<< $pactl_muted); 
-audio_volume=$(echo $(awk '$1=="Volume:" {print $5}' <<< $pactl_volume) | sed 's/[^0-9]//g');
+pactl_muted=$(pactl get-sink-mute @DEFAULT_SINK@)
+pactl_volume=$(pactl get-sink-volume @DEFAULT_SINK@)
+audio_muted=$(echo "$pactl_muted" | awk '$1=="Mute:" {print $2}')
+audio_volume=$(echo "$pactl_volume" | awk '$1=="Volume:" {print $5}' | sed 's/[^0-9]//g')
 
 if [ "$audio_volume" -gt "70" ]; then
 	audio_icon=""
@@ -25,4 +25,4 @@ fi
 
 [ "$audio_muted" = "yes" ] && audio_icon=""
 
-echo "$audio_icon $audio_volume%";
+printf "$audio_icon $audio_volume%%"
