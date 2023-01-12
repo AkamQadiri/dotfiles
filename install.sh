@@ -14,5 +14,5 @@ chmod u+x ~/.local/bin/*
 default_dirs=$(cat ~/.config/user-dirs.dirs | awk -F '"' '/^[^#]/ {print $2}' | sed 's/$HOME//')
 
 for default_dir in ${default_dirs[@]}; do
-  mkdir "$HOME$default_dir" 2>/dev/null
+	mkdir "$HOME$default_dir" 2>/dev/null
 done

@@ -4,5 +4,4 @@ case $BLOCK_BUTTON in
 	2) "$TERMINAL" -e "$EDITOR" "$0" ;;
 esac
 
-printf "\uf2c9 "
-sensors | awk '/Package id 0/ {print $4+0"°C"}'
+printf " $(sensors | awk '/Package id 0/ {print $4+0"°C"}')"

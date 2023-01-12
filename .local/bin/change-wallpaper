@@ -1,0 +1,7 @@
+#!/bin/sh
+
+if [ -z "$1" ]; then
+	wal -i ~/wallpapers -stq
+else
+	wal -i $1 -stq
+fi
