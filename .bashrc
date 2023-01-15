@@ -13,7 +13,7 @@ export PATH="${PATH}:${HOME}/.local/bin/"
 export HISTCONTROL='ignoreboth:erasedups'
 export TERMINAL='st'
 export EDITOR='vim'
-export NNN_PLUG='p:preview-tabbed;w:!change-wallpaper $nnn*'
+export NNN_PLUG='d:diffs;f:fixname;p:preview-tabbed;s:suedit;u:upload;w:!change-wallpaper $nnn*'
 
 alias nnn=n
 alias ls='ls --color=auto'
