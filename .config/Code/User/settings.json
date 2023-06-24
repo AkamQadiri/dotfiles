@@ -1,0 +1,10 @@
+{
+    "explorer.fileNesting.patterns": {
+        "*.cshtml": "${basename}.cshtml.cs, ${basename}.cshtml.css"
+    },
+    "explorer.fileNesting.enabled": true,
+    "git.enableSmartCommit": true,
+    "git.confirmSync": false,
+    "git.autofetch": true,
+    "git.defaultCloneDirectory": "~/source"
+}
