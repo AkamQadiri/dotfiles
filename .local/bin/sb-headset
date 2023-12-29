@@ -4,7 +4,7 @@ case $BLOCK_BUTTON in
 	2) "$TERMINAL" -e "$EDITOR" "$0" ;;
 esac
 
-battery=$(cloud_flight -r | awk '/Battery:/ {print $2}' | sed 's/[^0-9]//g')
+battery=$(cloud_flight -r | awk '/Battery:/ {print $2}' | sed 's/%//')
 battery_icon=""
 
 if [ -z "$battery" ]; then
@@ -12,7 +12,9 @@ if [ -z "$battery" ]; then
 	exit
 fi
 
-if [ "$battery" -ge "90" ]; then
+if [ "$battery" == "Charging" ]; then
+	battery_icon=""
+elif [ "$battery" -ge "90" ]; then
 	battery_icon=""
 elif [ "$battery" -ge "75" ]; then
 	battery_icon=""
