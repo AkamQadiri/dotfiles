@@ -1,4 +1,5 @@
 {
+    "editor.fontFamily": "'Droid Sans Mono', 'monospace', monospace,'Font Awesome 6 Brands', 'Font Awesome 6 Free', 'Font Awesome 6 Free Solid'",
     "explorer.fileNesting.patterns": {
         "*.cshtml": "${basename}.cshtml.cs, ${basename}.cshtml.css"
     },
