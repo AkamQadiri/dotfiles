@@ -14,6 +14,11 @@ export HISTCONTROL='ignoreboth:erasedups'
 export TERMINAL='st'
 export EDITOR='vim'
 export NNN_PLUG='d:diffs;f:fixname;p:preview-tabbed;s:suedit;u:upload;w:!change-wallpaper $nnn*'
+export ANDROID_HOME="${HOME}/Android/Sdk"
+export PATH="${PATH}:${ANDROID_HOME}/cmdline-tools/latest/bin"
+export PATH="${PATH}:${ANDROID_HOME}/emulator"
+export PATH="${PATH}:${ANDROID_HOME}/platform-tools"
+export PATH="${PATH}:${HOME}/.yarn/bin"
 
 alias nnn=n
 alias ls='ls --color=auto'
