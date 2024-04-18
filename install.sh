@@ -18,3 +18,6 @@ default_dirs=$(cat $HOME/.config/user-dirs.dirs | awk -F '"' '/^[^#]/ {print $2}
 for default_dir in ${default_dirs[@]}; do
 	mkdir "$HOME$default_dir" 2>/dev/null
 done
+
+#Regenerate GRUB
+sudo grub-mkconfig -o /boot/grub/grub.cfg
