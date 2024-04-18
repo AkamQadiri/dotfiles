@@ -1,9 +1,0 @@
-[credential]
-	helper = /usr/lib/git-core/git-credential-libsecret
-[user]
-	email = akamq@hotmail.com
-	name = AkamQadiri
-[http]
-	postBuffer = 157286400
-[init]
-	defaultBranch = master
