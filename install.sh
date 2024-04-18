@@ -1,10 +1,26 @@
 #!/bin/sh
 
+#Set system files permissions
+set_permissions() {
+    for file in "$1"/*; do
+        if [ -d "$file" ]; then
+            sudo chmod 755 "$file"
+            set_permissions "$file"
+        elif [ -f "$file" ]; then
+            sudo chmod 644 "$file"
+        fi
+    done
+}
+set_permissions "$PWD/system"
+
 #Install dotfiles
 cp -a $PWD/dotfiles/* $HOME
 
 #Install system files
+current_user=$(whoami)
+sudo chown root:root -R $PWD/system/
 sudo cp -a $PWD/system/* /
+sudo chown $current_user:$current_user -R $PWD/system/
 
 #Enable systemd services
 sudo systemctl --now enable hdd-sleep
