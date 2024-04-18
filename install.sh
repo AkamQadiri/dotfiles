@@ -19,5 +19,5 @@ for default_dir in ${default_dirs[@]}; do
 	mkdir "$HOME$default_dir" 2>/dev/null
 done
 
-#Regenerate GRUB
+#Regenerate GRUB config
 sudo grub-mkconfig -o /boot/grub/grub.cfg
