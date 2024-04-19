@@ -1,5 +1,10 @@
 #!/bin/sh
 
+if [ $EUID -eq 0 ]; then
+  echo "This script can't be run as root"
+  exit
+fi
+
 #Set system files permissions
 set_permissions() {
     for file in "$1"/*; do
