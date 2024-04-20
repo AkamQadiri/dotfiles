@@ -1,0 +1,63 @@
+#!/bin/bash
+
+# Set GitHub variables
+GITHUB_USER=$(git config user.name)
+GITHUB_CREDENTIALS=$(git credential fill <<<"url=https://github.com")
+GITHUB_USERNAME=$(echo "$GITHUB_CREDENTIALS" | grep 'username' | cut -d '=' -f2)
+GITHUB_PASSWORD=$(echo "$GITHUB_CREDENTIALS" | grep 'password' | cut -d '=' -f2)
+GITHUB_REPOS=$(curl -s -L -H "Accept: application/vnd.github+json" https://$GITHUB_USERNAME:$GITHUB_PASSWORD@api.github.com/user/repos | jq -r '.[].full_name')
+
+# Set other variables
+REPOS_DIR="/tmp/$GITHUB_USER-repos"
+BACKUP_DATE=$(date +"%Y-%m-%dT%H:%M:%S%:z")
+ARCHIVE_NAME="$GITHUB_USER-repos-$BACKUP_DATE.tar.gz"
+BACKUP_DRIVE="/dev/sda"
+BACKUP_DESTINATION="backup/github"
+BACKUP_DRIVE_MOUNTPOINT=$(findmnt -nr -o target -S "$BACKUP_DRIVE")
+UNMOUNT_BACKUP_DRIVE=true
+
+# Don't unmount the backup drive if it was mounted before the script was ran
+if [ -n "$BACKUP_DRIVE_MOUNTPOINT" ]; then
+    UNMOUNT_BACKUP_DRIVE=false
+fi
+
+# Mount backup drive if it isn't mounted
+if [ -z "$BACKUP_DRIVE_MOUNTPOINT" ]; then
+    echo "Mounting backup drive..."
+    mount "$BACKUP_DRIVE"
+    BACKUP_DRIVE_MOUNTPOINT=$(findmnt -nr -o target -S "$BACKUP_DRIVE")
+else
+    echo "Backup drive ($BACKUP_DRIVE) is already is mounted at $BACKUP_DRIVE_MOUNTPOINT"
+fi
+
+# Exit if backup drive isn't mounted or failed to mount
+if [ -z "$BACKUP_DRIVE_MOUNTPOINT" ]; then
+    echo "Failed to mount drive!"
+    echo "Quitting script"
+    exit 1
+fi
+
+BACKUP_DESTINATION="$BACKUP_DRIVE_MOUNTPOINT/$BACKUP_DESTINATION"
+
+echo "Making a temporary directory at $REPOS_DIR..."
+mkdir -p "$REPOS_DIR"
+
+echo "Cloning GitHub repositories..."
+for REPO in $GITHUB_REPOS; do
+    git -C "$REPOS_DIR" clone "https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/$REPO"
+    echo
+done
+
+echo "Archiving all the cloned repositories into a Tar GZip file..."
+mkdir -p "$BACKUP_DESTINATION"
+tar -czf "$BACKUP_DESTINATION/$ARCHIVE_NAME" -C "$REPOS_DIR" . --force-local
+
+echo "Removing the temporary directory at $REPOS_DIR..."
+rm -rf "$REPOS_DIR"
+
+if $UNMOUNT_BACKUP_DRIVE; then
+    echo "Unmounting backup drive..."
+    umount "$BACKUP_DRIVE"
+fi
+
+echo "All repositories from $GITHUB_USER have been cloned and archived into $BACKUP_DESTINATION/$ARCHIVE_NAME"
