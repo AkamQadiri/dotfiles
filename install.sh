@@ -25,8 +25,7 @@ cp -a $PWD/dotfiles/. $HOME
 DRIVE_NAME=$(findmnt -no SOURCE /)
 DRIVE_UUID=$(lsblk -no UUID $DRIVE_NAME)
 
-# Replace placeholders with actual values
-sed -i "s#\$DRIVE_NAME#$DRIVE_NAME#g" "system/etc/fstab"
+# Replace placeholder with actual values
 sed -i "s#\$DRIVE_UUID#$DRIVE_UUID#g" "system/etc/fstab"
 
 # Install system files
