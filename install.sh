@@ -23,7 +23,7 @@ cp -a $PWD/dotfiles/. $HOME
 
 # Retrieve the Name and UUID of the drive currently running the Linux system
 DRIVE_NAME=$(findmnt -no SOURCE /)
-DRIVE_UUID=$(lsblk -no UUID $drive)
+DRIVE_UUID=$(lsblk -no UUID $DRIVE_NAME)
 
 # Replace placeholders with actual values
 sed -i "s#\$DRIVE_NAME#$DRIVE_NAME#g" "system/etc/fstab"
