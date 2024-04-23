@@ -22,7 +22,7 @@ set_permissions "$PWD/system"
 cp -a $PWD/dotfiles/. $HOME
 
 # Retrieve the UUID of the drive currently running the Linux system
-DRIVE_UUID=$(findmnt -fn -o UUID /)
+DRIVE_UUID=$(sudo findmnt -fn -o UUID /)
 
 # Replace placeholder with actual values
 sed -i "s#\$DRIVE_UUID#$DRIVE_UUID#g" "system/etc/fstab"
