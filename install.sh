@@ -21,9 +21,8 @@ set_permissions "$PWD/system"
 # Install dotfiles
 cp -a $PWD/dotfiles/. $HOME
 
-# Retrieve the Name and UUID of the drive currently running the Linux system
-DRIVE_NAME=$(findmnt -no SOURCE /)
-DRIVE_UUID=$(lsblk -no UUID $DRIVE_NAME)
+# Retrieve the UUID of the drive currently running the Linux system
+DRIVE_UUID=$(findmnt -fn -o UUID /)
 
 # Replace placeholder with actual values
 sed -i "s#\$DRIVE_UUID#$DRIVE_UUID#g" "system/etc/fstab"
