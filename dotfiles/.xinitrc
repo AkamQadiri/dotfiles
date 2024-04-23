@@ -5,6 +5,7 @@ export XDG_SESSION_DESKTOP="$XDG_CURRENT_DESKTOP"
 export XDG_SESSION_TYPE=X11
 export _JAVA_AWT_WM_NONREPARENTING=1
 
+xlogdir=$HOME/.local/share/xorg
 userresources=$HOME/.Xresources
 usermodmap=$HOME/.Xmodmap
 sysresources=/etc/X11/xinit/.Xresources
@@ -35,16 +36,21 @@ if [ -d /etc/X11/xinit/xinitrc.d ]; then
     unset f
 fi
 
-# setup monitors
-xrandr --output HDMI-1 --mode 2560x1440 -r 144 --primary
-xrandr --output DP-1 --mode 1920x1080 -r 60 --right-of HDMI-1
+# move previous dwm log if exists
+if [ -f "$xlogdir/dwm.log" ]; then
+    mv "$xlogdir/dwm.log" "$xlogdir/dwm.log.old"
+fi
+
+# configure monitors
+xrandr --output HDMI-1 --mode 2560x1440 -r 144 --primary \
+       --output DP-1 --mode 1920x1080 -r 60 --right-of HDMI-1
 xset s off -dpms # disable DPMS and prevent screen from blanking
 
-# start DE
+# start necessary programs
 numlockx
-wal -Rstq # Set background and theme from cache with pywal
+wal -Rstq # set background and theme from cache with pywal
 picom &
 unclutter &
 lxpolkit &
 dwmblocks &
-exec dwm
+exec dwm >>"$xlogdir/dwm.log" 2>&1
