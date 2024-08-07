@@ -1,9 +1,0 @@
-[Unit]
-Description=Put HDD drive to sleep on boot
-
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/hdparm -q -Y /dev/sda
-
-[Install]
-WantedBy=multi-user.target

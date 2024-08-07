@@ -30,7 +30,15 @@ sed -i "s#\$DRIVE_UUID#$DRIVE_UUID#g" "system/etc/fstab"
 # Install system files
 current_user=$(whoami)
 sudo chown root:root -R $PWD/system/
-sudo cp -a $PWD/system/. /
+sudo cp -a $PWD/system/common/. /
+
+# Check for hypervisor presence in CPU flags
+if grep -qE 'vmx|svm' /proc/cpuinfo; then
+    sudo cp -a $PWD/system/vm/. /
+else
+    sudo cp -a $PWD/system/bare_metal/. /
+fi
+
 sudo chown $current_user:$current_user -R $PWD/system/
 
 # Get mount points listed in fstab
@@ -41,10 +49,6 @@ for mount_point in $mount_points; do
     sudo mkdir -p $mount_point
     sudo chown $current_user:$current_user $mount_point
 done
-
-# Enable systemd services
-sudo systemctl daemon-reload
-sudo systemctl --now enable hdd-sleep
 
 # Make local binaries executable
 chmod u+x ~/.local/bin/*
