@@ -1,8 +1,0 @@
-# Static information about the filesystems.
-# See fstab(5) for details.
-
-# <file system>                             <dir>       <type>  <options>                <dump>  <pass>
-UUID=$DRIVE_UUID   /           ext4    rw,relatime              0       1
-UUID=1b1d65b8-6071-4b20-8875-59ced3b11acb   /mnt/hdd    auto    defaults,noauto,users    0       2
-/dev/sdb1                                   /mnt/usb1   auto    noauto,users,rw          0       0
-/dev/sdb2                                   /mnt/usb2   auto    noauto,users,rw          0       0
