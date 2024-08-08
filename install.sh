@@ -25,7 +25,7 @@ cp -a $PWD/dotfiles/. $HOME
 DRIVE_UUID=$(sudo findmnt -fn -o UUID /)
 
 # Replace placeholder with actual values
-sed -i "s#\$DRIVE_UUID#$DRIVE_UUID#g" "system/etc/fstab"
+sed -i "s#\$DRIVE_UUID#$DRIVE_UUID#g" "system/common/etc/fstab"
 
 # Install system files
 current_user=$(whoami)
