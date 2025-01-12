@@ -1,0 +1,74 @@
+#!/bin/bash
+
+output_file="project.txt"
+rm -f "$output_file"
+
+find . \( \
+    -not -path '*/.*/*' \
+    -not -path '*/node_modules/*' \
+    -not -path '*/bin/*' \
+    -not -path '*/obj/*' \
+    -not -path '*/out/*' \
+    -not -path '*/target/*' \
+    -not -path '*/coverage/*' \
+    -not -path '*/.nyc_output/*' \
+    -not -path '*/reports/*' \
+    -not -path '*/logs/*' \
+    -not -path '*/wwwroot/lib/*' \
+    -not -path '*/Migrations/*' \
+  \) -type f \( \
+    ! -name '*.png' \
+    ! -name '*.jpg' \
+    ! -name '*.jpeg' \
+    ! -name '*.gif' \
+    ! -name '*.webp' \
+    ! -name '*.svg' \
+    ! -name '*.ico' \
+    ! -name '*.ttf' \
+    ! -name '*.woff' \
+    ! -name '*.woff2' \
+    ! -name '*.md' \
+    ! -name '*.txt' \
+    ! -name '*.json' \
+    ! -name '*.lock' \
+    ! -name '*.log' \
+    ! -name '*.env' \
+    ! -name '*.gitignore' \
+    ! -name '*DS_Store*' \
+    ! -name 'package-lock.json' \
+    ! -name 'yarn.lock' \
+    ! -name 'pnpm-lock.yaml' \
+    ! -name '*~' \
+    ! -name '*.swp' \
+    ! -name 'Thumbs.db' \
+    ! -name '.editorconfig' \
+    ! -name '.dockerignore' \
+    ! -name '.eslint*' \
+    ! -name '.prettierrc*' \
+    ! -name '.stylelintrc*' \
+    ! -name '*.dll' \
+    ! -name '*.exe' \
+    ! -name '*.pdb' \
+    ! -name '*.class' \
+    ! -name '*.jar' \
+    ! -name '*.xproj' \
+    ! -name '*.csproj' \
+    ! -name '*.vbproj' \
+    ! -name '*.fsproj' \
+    ! -name '*.props' \
+    ! -name '*.targets' \
+    ! -name 'Dockerfile' \
+    ! -name 'docker-compose.*' \
+  \) -print | while IFS= read -r file
+do
+  # Append the filename as a header
+  echo "### $file" >> "$output_file"
+
+  # Append the file contents
+  cat "$file" >> "$output_file"
+
+  # Add a double newline for separation
+  echo -e "\n" >> "$output_file"
+done
+
+echo "All files have been combined into $output_file."
