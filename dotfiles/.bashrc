@@ -19,6 +19,7 @@ export PATH="${PATH}:${ANDROID_HOME}/cmdline-tools/latest/bin"
 export PATH="${PATH}:${ANDROID_HOME}/emulator"
 export PATH="${PATH}:${ANDROID_HOME}/platform-tools"
 export PATH="${PATH}:${HOME}/.yarn/bin"
+export PATH="${PATH}:${HOME}/.dotnet/tools"
 
 alias nnn=n
 alias ls='ls --color=auto'

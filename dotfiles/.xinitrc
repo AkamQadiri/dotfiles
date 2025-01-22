@@ -42,8 +42,8 @@ if [ -f "$xlogdir/dwm.log" ]; then
 fi
 
 # configure monitors
-xrandr --output HDMI-1 --mode 2560x1440 -r 144 --primary \
-       --output DP-1 --mode 1920x1080 -r 60 --right-of HDMI-1
+xrandr --output DP-2 --mode 2560x1440 -r 144 --primary \
+       --output DP-0 --mode 1920x1080 -r 144 --right-of DP-2
 xset s off -dpms # disable DPMS and prevent screen from blanking
 
 # start necessary programs
