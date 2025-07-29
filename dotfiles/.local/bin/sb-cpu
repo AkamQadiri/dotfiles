@@ -1,7 +1,0 @@
-#!/bin/sh
-
-case $BLOCK_BUTTON in
-	2) "$TERMINAL" -e "$EDITOR" "$0" ;;
-esac
-
-printf " $(sensors | awk '/Tctl/ {printf "%.0f°C", $2+0}')"

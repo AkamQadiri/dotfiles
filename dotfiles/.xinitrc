@@ -48,7 +48,6 @@ xset s off -dpms # disable DPMS and prevent screen from blanking
 
 # start necessary programs
 numlockx
-wal -Rstq # set background and theme from cache with pywal
 picom &
 unclutter &
 lxpolkit &
