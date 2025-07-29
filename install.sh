@@ -1,65 +1,84 @@
-#!/bin/sh
+#!/bin/bash
 
-if [ $EUID -eq 0 ]; then
-  echo "This script can't be run as root"
-  exit
+# Dotfiles installation and system configuration
+
+# === PERMISSION CHECK ===
+# Ensure script is not run as root
+if [[ "$(id -u)" -eq 0 ]]; then
+    echo "This script can't be run as root"
+    exit 1
 fi
 
-# Set system files permissions
+# === SYSTEM FILE PERMISSIONS ===
+# Recursively set correct permissions for system files
 set_permissions() {
-    for file in "$1"/*; do
-        if [ -d "$file" ]; then
+    local path="$1"
+    for file in "$path"/*; do
+        if [[ -d "$file" ]]; then
             sudo chmod 755 "$file"
             set_permissions "$file"
-        elif [ -f "$file" ]; then
+        elif [[ -f "$file" ]]; then
             sudo chmod 644 "$file"
         fi
     done
 }
-set_permissions "$PWD/system"
 
-# Install dotfiles
-cp -a $PWD/dotfiles/. $HOME
+# Apply permissions to system directory
+set_permissions "${PWD}/system"
 
-# Retrieve the UUID of the drive currently running the Linux system
+# === USER CONFIGURATION ===
+# Install user dotfiles to home directory
+cp -a "${PWD}/dotfiles/." "${HOME}"
+
+# === FILESYSTEM CONFIGURATION ===
+# Get UUID of current root filesystem
 DRIVE_UUID=$(sudo findmnt -fn -o UUID /)
 
-# Replace placeholder with actual values
-sed -i "s#\$DRIVE_UUID#$DRIVE_UUID#g" "system/common/etc/fstab"
+# Update fstab with actual UUID
+sed -i "s#\$DRIVE_UUID#${DRIVE_UUID}#g" "system/etc/fstab"
 
-# Install system files
+# === SYSTEM FILES INSTALLATION ===
+# Store current user for permission restoration
 current_user=$(whoami)
-sudo chown root:root -R $PWD/system/
-sudo cp -a $PWD/system/common/. /
 
-# Check for hypervisor presence in CPU flags
-if grep -qE 'vmx|svm' /proc/cpuinfo; then
-    sudo cp -a $PWD/system/vm/. /
-else
-    sudo cp -a $PWD/system/bare_metal/. /
-fi
+# Set root ownership for system files
+sudo chown root:root -R "${PWD}/system/"
 
-sudo chown $current_user:$current_user -R $PWD/system/
+# Install system configuration files
+sudo cp -a "${PWD}/system/." /
 
-# Get mount points listed in fstab
+# Restore user ownership of source files
+sudo chown "${current_user}:${current_user}" -R "${PWD}/system/"
+
+# === MOUNT POINT CONFIGURATION ===
+# Create mount points defined in fstab
 mount_points=$(awk '$1 !~ /^#/ && $2 != "/" && $2 != "" {print $2}' /etc/fstab)
 
-# Create mount points and set permissions
-for mount_point in $mount_points; do
-    sudo mkdir -p $mount_point
-    sudo chown $current_user:$current_user $mount_point
+for mount_point in ${mount_points}; do
+    sudo mkdir -p "${mount_point}"
+    sudo chown "${current_user}:${current_user}" "${mount_point}"
 done
 
-# Make local binaries executable
-chmod u+x ~/.local/bin/*
+# === EXECUTABLE PERMISSIONS ===
+# Make user scripts executable
+if [[ -d "${HOME}/.local/bin" ]]; then
+    chmod u+x "${HOME}/.local/bin/"*
+fi
 
-# Create default dirs
-default_dirs=$(cat $HOME/.config/user-dirs.dirs | awk -F '"' '/^[^#]/ {print $2}' | sed 's/$HOME//')
+# === XDG USER DIRECTORIES ===
+# Create standard user directories
+if [[ -f "${HOME}/.config/user-dirs.dirs" ]]; then
+    # Extract directory paths from XDG config
+    while IFS= read -r line; do
+        if [[ "$line" =~ ^[^#]*\"(.*)\" ]]; then
+            dir_path="${BASH_REMATCH[1]}"
+            # Expand $HOME variable
+            dir_path="${dir_path/\$HOME/${HOME}}"
+            mkdir -p "${dir_path}" 2>/dev/null
+        fi
+    done < "${HOME}/.config/user-dirs.dirs"
+fi
 
-for default_dir in ${default_dirs[@]}; do
-	mkdir "$HOME$default_dir" 2>/dev/null
-done
-
-# Regenerate initramfs and GRUB config
+# === SYSTEM UPDATE ===
+# Regenerate initramfs to apply kernel changes
 sudo mkinitcpio -P
-sudo grub-mkconfig -o /boot/grub/grub.cfg
