@@ -36,9 +36,9 @@ if [ -d /etc/X11/xinit/xinitrc.d ]; then
     unset f
 fi
 
-# move previous dwm log if exists
-if [ -f "$xlogdir/dwm.log" ]; then
-    mv "$xlogdir/dwm.log" "$xlogdir/dwm.log.old"
+# move previous wm log if exists
+if [ -f "$xlogdir/wm.log" ]; then
+    mv "$xlogdir/wm.log" "$xlogdir/wm.log.old"
 fi
 
 # configure monitors
@@ -51,5 +51,5 @@ numlockx
 picom &
 unclutter &
 lxpolkit &
-dwmblocks &
-exec dwm >>"$xlogdir/dwm.log" 2>&1
+sxbar &
+exec sxwm >>"$xlogdir/wm.log" 2>&1
