@@ -1,7 +1,0 @@
-#!/bin/sh
-
-case $BLOCK_BUTTON in
-	2) "$TERMINAL" -e "$EDITOR" "$0" ;;
-esac
-
-printf " $(free -h | awk '/^Mem/ { print $3"/"$2 }')"

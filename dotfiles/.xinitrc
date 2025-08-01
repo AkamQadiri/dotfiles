@@ -1,11 +1,12 @@
 #!/bin/sh
 
-export XDG_CURRENT_DESKTOP=dwm
+export XDG_CURRENT_DESKTOP=i3
 export XDG_SESSION_DESKTOP="$XDG_CURRENT_DESKTOP"
 export XDG_SESSION_TYPE=X11
 export _JAVA_AWT_WM_NONREPARENTING=1
 
 xlogdir=$HOME/.local/share/xorg
+wmlogpath="$xlogdir/$XDG_CURRENT_DESKTOP.log"
 userresources=$HOME/.Xresources
 usermodmap=$HOME/.Xmodmap
 sysresources=/etc/X11/xinit/.Xresources
@@ -36,20 +37,20 @@ if [ -d /etc/X11/xinit/xinitrc.d ]; then
     unset f
 fi
 
-# move previous wm log if exists
-if [ -f "$xlogdir/wm.log" ]; then
-    mv "$xlogdir/wm.log" "$xlogdir/wm.log.old"
+# move previous dwm log if exists
+if [ -f "$wmlogpath" ]; then
+    mv "$wmlogpath" "$wmlogpath.old"
 fi
 
 # configure monitors
 xrandr --output DP-2 --mode 2560x1440 -r 144 --primary \
-       --output DP-0 --mode 1920x1080 -r 144 --right-of DP-2
+    --output DP-0 --mode 1920x1080 -r 144 --right-of DP-2
 xset s off -dpms # disable DPMS and prevent screen from blanking
 
 # start necessary programs
+random-wallpaper
 numlockx
 picom &
 unclutter &
 lxpolkit &
-sxbar &
-exec sxwm >>"$xlogdir/wm.log" 2>&1
+exec $XDG_CURRENT_DESKTOP >>"$wmlogpath" 2>&1

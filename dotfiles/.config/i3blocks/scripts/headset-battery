@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# Headset battery indicator
+# Shows HyperX Cloud Flight battery status
+
+# === HANDLE MOUSE CLICKS ===
+# Button 2: Edit this script
+case $BLOCK_BUTTON in
+2) "$TERMINAL" -e "$EDITOR" "$0" ;;
+esac
+
+# === GET BATTERY STATUS ===
+# Query headset battery level
+battery=$(cloud_flight -r | awk '/Battery:/ {print $2}' | sed 's/%//')
+battery_icon=""
+
+# Exit if headset not connected
+if [ -z "$battery" ]; then
+    echo " "
+    exit
+fi
+
+# === DETERMINE ICON ===
+# Select appropriate battery icon based on status
+if [ "$battery" == "Charging" ]; then
+    battery_icon=""
+elif [ "$battery" -ge "90" ]; then
+    battery_icon=""
+elif [ "$battery" -ge "75" ]; then
+    battery_icon=""
+elif [ "$battery" -ge "50" ]; then
+    battery_icon=""
+elif [ "$battery" -ge "25" ]; then
+    battery_icon=""
+fi
+
+# === OUTPUT STATUS ===
+echo "  $battery_icon"

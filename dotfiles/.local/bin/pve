@@ -1,0 +1,23 @@
+#!/bin/bash
+
+HOST=""
+NODE="pve"
+COMMAND=$1
+VM_ID=$2
+USERNAME="script@pve"
+PASSWORD=""
+API_BASE="https://$HOST/api2/json"
+API_RESOURCE="nodes/$NODE/qemu/$VM_ID/status/$COMMAND"
+API_TICKET_URL="${API_BASE}/access/ticket"
+
+if [[ "$COMMAND" != "start" && "$COMMAND" != "shutdown" && "$COMMAND" != "reboot" ]]; then
+    echo "$COMMAND is not a valid argument."
+    echo "Valid arguments are: 'start', 'shutdown' or 'reboot'."
+    exit 1
+fi
+
+TICKET_DATA=$(curl -s --insecure --data "username=${USERNAME}&password=${PASSWORD}" "${API_TICKET_URL}") || exit 1
+TICKET=$(jq -r '.data.ticket' <<<"$TICKET_DATA")
+TOKEN_ID=$(jq -r '.data.CSRFPreventionToken' <<<"$TICKET_DATA")
+
+curl -s --insecure --cookie "PVEAuthCookie=$TICKET" --header "CSRFPreventionToken:$TOKEN_ID" -X POST "$API_BASE/$API_RESOURCE"

@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Disk usage indicator
+# Shows used/total space on root partition
+
+# === HANDLE MOUSE CLICKS ===
+# Button 2: Edit this script
+case $BLOCK_BUTTON in
+2) "$TERMINAL" -e "$EDITOR" "$0" ;;
+esac
+
+# === OUTPUT DISK USAGE ===
+echo " $(df -h / | awk '$NF=="/" {print $3 "/" $2}')"

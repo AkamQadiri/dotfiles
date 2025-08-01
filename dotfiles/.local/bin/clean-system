@@ -1,0 +1,65 @@
+#!/bin/bash
+
+# System maintenance utility
+# Cleans package cache, logs, and temporary files
+
+# === PERMISSION CHECK ===
+# Ensure script is not run as root
+if [[ "$(id -u)" -eq 0 ]]; then
+    echo "This script can't be run as root"
+    exit 1
+fi
+
+clear
+
+# === PACKAGE CACHE CLEANUP ===
+# Clear pacman package cache
+sudo pacman -Scc --noconfirm
+
+# Remove orphaned packages
+orphans=$(sudo pacman -Qdtq)
+if [[ -n "${orphans}" ]]; then
+    # shellcheck disable=SC2086
+    sudo pacman -Rns ${orphans}
+fi
+echo
+
+# === LOG CLEANUP ===
+# Clear system logs
+sudo tee /var/log/wtmp /var/log/btmp </dev/null
+
+# === DIRECTORY CLEANUP ===
+# Define directories to clean
+system_directories=(
+    /var/log/journal
+    /var/log/libvirt
+)
+
+user_directories=(
+    ~/.cache
+    ~/.local/pipx/logs
+    ~/.local/share/Trash
+    ~/.local/share/xorg
+    ~/.local/state/mpv
+)
+
+# Clean directories function
+clean_directories() {
+    local directories=("$@")
+    for dir in "${directories[@]}"; do
+        if [[ -d "${dir}" ]]; then
+            sudo find "${dir}" -mindepth 1 -delete 2>/dev/null || true
+        fi
+        echo "Cleaned ${dir}"
+    done
+}
+
+# Execute cleanup
+clean_directories "${system_directories[@]}"
+clean_directories "${user_directories[@]}"
+echo
+
+# === HISTORY CLEANUP ===
+# Clear bash history
+cat /dev/null >~/.bash_history && history -c && history -w
+echo "Bash history cleared"

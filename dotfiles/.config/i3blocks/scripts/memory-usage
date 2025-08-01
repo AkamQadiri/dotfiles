@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# Memory usage indicator
+# Shows used/total memory
+
+# === HANDLE MOUSE CLICKS ===
+# Button 2: Edit this script
+case $BLOCK_BUTTON in
+2) "$TERMINAL" -e "$EDITOR" "$0" ;;
+esac
+
+# === OUTPUT MEMORY USAGE ===
+echo " $(awk '
+/^MemTotal:/ { total=$2 }
+/^MemFree:/ { free=$2 }
+/^Buffers:/ { free+=$2 }
+/^Cached:/ { free+=$2 }
+END {
+    used=(total-free)/1024/1024
+    total_gb=total/1024/1024
+    printf " %.1fG/%.1fG\n", used, total_gb
+}' /proc/meminfo)"

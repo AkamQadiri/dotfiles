@@ -1,7 +1,0 @@
-#!/bin/sh
-
-case $BLOCK_BUTTON in
-	2) "$TERMINAL" -e "$EDITOR" "$0" ;;
-esac
-
-printf " $(df -h / | awk ' /[0-9]/ {print $3 "/" $2}')"
