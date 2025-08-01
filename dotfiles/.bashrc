@@ -7,10 +7,10 @@
 
 PS1='[\u@\h \W]\$ '
 
-export PATH="${PATH}:${HOME}/.local/bin/"
 export HISTCONTROL='ignoreboth:erasedups'
 export TERMINAL='ghostty'
 export EDITOR='nvim'
+export PATH="${PATH}:${HOME}/.local/bin/"
 export ANDROID_HOME="${HOME}/Android/Sdk"
 export PATH="${PATH}:${ANDROID_HOME}/cmdline-tools/latest/bin"
 export PATH="${PATH}:${ANDROID_HOME}/emulator"
