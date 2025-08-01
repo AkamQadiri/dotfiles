@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# Network status indicator
+# Shows WiFi strength, Ethernet status, and VPN connections
+
+# === HELPER FUNCTIONS ===
+# Toggle wireless radio frequency blocking
+toggle_rf() {
+    local rf_status
+    rf_status=$(rfkill -ro Soft list wlan | grep "blocked")
+
+    if [[ "${rf_status}" == "unblocked" ]]; then
+        rfkill block all
+    else
+        rfkill unblock all
+    fi
+}
+
+# === HANDLE MOUSE CLICKS ===
+# Button 1: Open network manager
+# Button 2: Edit this script
+# Button 3: Toggle WiFi on/off
+case ${BLOCK_BUTTON} in
+1) "${TERMINAL}" -e nmtui ;;
+2) "${TERMINAL}" -e "${EDITOR}" "$0" ;;
+3) toggle_rf ;;
+esac
+
+# === WIFI STATUS ===
+# Check if WiFi interface is up and get signal strength
+if grep -xq 'up' /sys/class/net/w*/operstate 2>/dev/null; then
+    wifiicon=$(awk '/^\s*w/ { print "", int($3 * 100 / 70) "% " }' /proc/net/wireless)
+elif grep -xq 'down' /sys/class/net/w*/operstate 2>/dev/null; then
+    # Check if WiFi is disabled
+    grep -xq '0x1003' /sys/class/net/w*/flags && wifiicon=""
+fi
+
+# === OUTPUT STATUS ===
+# Combine WiFi, Ethernet, and VPN status
+echo "$wifiicon $(sed "s/down//;s/up//" /sys/class/net/e*/operstate 2>/dev/null)$(sed "s/.*//" /sys/class/net/tun*/operstate 2>/dev/null)"

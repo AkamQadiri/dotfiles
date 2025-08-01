@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Clock indicator
+# Shows time and date
+
+# === HANDLE MOUSE CLICKS ===
+# Button 2: Edit this script
+case $BLOCK_BUTTON in
+2) "$TERMINAL" -e "$EDITOR" "$0" ;;
+esac
+
+# === OUTPUT TIME AND DATE ===
+echo " $(date "+%H:%M %d.%m")"

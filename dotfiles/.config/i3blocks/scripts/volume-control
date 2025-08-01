@@ -1,0 +1,51 @@
+#!/bin/sh
+
+# Volume control indicator
+# Shows audio volume and mute status
+
+# === HANDLE MOUSE CLICKS ===
+# Button 1: Toggle mute
+# Button 2: Edit this script
+# Button 3: Open volume control
+# Scroll up: Increase volume
+# Scroll down: Decrease volume
+case $BLOCK_BUTTON in
+1) pactl set-sink-mute @DEFAULT_SINK@ toggle ;;
+2) "$TERMINAL" -e "$EDITOR" "$0" ;;
+3) pavucontrol ;;
+4)
+    pactl set-sink-mute @DEFAULT_SINK@ 0
+    pactl set-sink-volume @DEFAULT_SINK@ +1%
+    ;;
+5)
+    pactl set-sink-mute @DEFAULT_SINK@ 0
+    pactl set-sink-volume @DEFAULT_SINK@ -1%
+    ;;
+esac
+
+# === GET AUDIO STATUS ===
+# Query PulseAudio for current status
+pactl_muted=$(pactl get-sink-mute @DEFAULT_SINK@)
+pactl_volume=$(pactl get-sink-volume @DEFAULT_SINK@)
+
+# Parse mute and volume values
+audio_muted=$(echo "$pactl_muted" | awk '$1=="Mute:" {print $2}')
+audio_volume=$(echo "$pactl_volume" | awk '$1=="Volume:" {print $5}' | sed 's/[^0-9]//g')
+
+# === DETERMINE ICON ===
+# Select appropriate volume icon based on level
+if [ "$audio_volume" -gt "70" ]; then
+    audio_icon=""
+elif [ "$audio_volume" -gt "30" ]; then
+    audio_icon=""
+elif [ "$audio_volume" -gt "0" ]; then
+    audio_icon=""
+else
+    audio_icon=""
+fi
+
+# Override icon if muted
+[ "$audio_muted" = "yes" ] && audio_icon=""
+
+# === OUTPUT STATUS ===
+echo "$audio_icon $audio_volume%"

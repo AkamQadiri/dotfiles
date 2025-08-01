@@ -1,8 +1,17 @@
 #!/bin/bash
 
-output_file="project.txt"
-rm -f "$output_file"
+# Project file aggregator
+# Combines source files into a single text file for documentation
 
+# === CONFIGURATION ===
+output_file="project.txt"
+
+# === CLEANUP ===
+# Remove existing output file
+rm -f "${output_file}"
+
+# === FILE DISCOVERY ===
+# Find and process eligible files
 find . \( \
     -not -path '*/.*/*' \
     -not -path '*/node_modules/*' \
@@ -16,7 +25,7 @@ find . \( \
     -not -path '*/logs/*' \
     -not -path '*/wwwroot/lib/*' \
     -not -path '*/Migrations/*' \
-  \) -type f \( \
+    \) -type f \( \
     ! -name '*.png' \
     ! -name '*.jpg' \
     ! -name '*.jpeg' \
@@ -27,7 +36,6 @@ find . \( \
     ! -name '*.ttf' \
     ! -name '*.woff' \
     ! -name '*.woff2' \
-    ! -name '*.md' \
     ! -name '*.txt' \
     ! -name '*.json' \
     ! -name '*.lock' \
@@ -59,16 +67,13 @@ find . \( \
     ! -name '*.targets' \
     ! -name 'Dockerfile' \
     ! -name 'docker-compose.*' \
-  \) -print | while IFS= read -r file
-do
-  # Append the filename as a header
-  echo "### $file" >> "$output_file"
-
-  # Append the file contents
-  cat "$file" >> "$output_file"
-
-  # Add a double newline for separation
-  echo -e "\n" >> "$output_file"
+    \) -print | while IFS= read -r file; do
+    # === FILE PROCESSING ===
+    {
+        echo "### ${file}"
+        cat "${file}"
+        printf "\n\n"
+    } >>"${output_file}"
 done
 
-echo "All files have been combined into $output_file."
+echo "All files have been combined into ${output_file}."

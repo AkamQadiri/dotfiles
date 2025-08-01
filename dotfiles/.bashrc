@@ -18,6 +18,6 @@ export PATH="${PATH}:${ANDROID_HOME}/platform-tools"
 export PATH="${PATH}:${HOME}/.yarn/bin"
 export PATH="${PATH}:${HOME}/.dotnet/tools"
 
+alias shutdown='pve shutdown 200'
 alias ls='ls --color=auto'
-alias shutdown='sudo shutdown now'
-alias reboot='sudo reboot now'
+alias vim="nvim"
