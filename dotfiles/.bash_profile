@@ -1,17 +1,20 @@
-#
 # ~/.bash_profile
-#
+# Executed for login shells
 
-xlogdir=$HOME/.local/share/xorg
-
+# === SOURCE BASHRC ===
 [[ -f ~/.bashrc ]] && . ~/.bashrc
 
-# create xorg log directory
-mkdir -p "$xlogdir"
+# === X11 STARTUP ===
+# Start X11 if on tty1
+if [[ -z "${DISPLAY}" ]] && [[ "${XDG_VTNR}" -eq 1 ]]; then
+    # Create log directory
+    XLOG_DIR="${XDG_DATA_HOME}/xorg"
+    mkdir -p "${XLOG_DIR}"
 
-# move previous startx log if exists
-if [ -f "$xlogdir/startx.log" ]; then
-    mv "$xlogdir/startx.log" "$xlogdir/startx.log.old"
+    # Rotate logs
+    [[ -f "${XLOG_DIR}/startx.log" ]] &&
+        mv "${XLOG_DIR}/startx.log" "${XLOG_DIR}/startx.log.old"
+
+    # Start X11
+    exec startx >>"${XLOG_DIR}/startx.log" 2>&1
 fi
-
-startx >>"$xlogdir/startx.log" 2>&1

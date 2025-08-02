@@ -1,3 +1,5 @@
+# i3blocks Configuration
+# Global properties
 command=~/.config/i3blocks/scripts/$BLOCK_NAME
 separator=false
 separator_block_width=20

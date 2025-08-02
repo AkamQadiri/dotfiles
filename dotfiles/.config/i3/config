@@ -1,26 +1,31 @@
+# i3 Window Manager Configuration
+# Documentation: https://i3wm.org/docs/userguide.html
+
 # =============================================================================
 # BASIC SETTINGS
 # =============================================================================
 set $mod Mod4
 
-# Font for window titles and bar (unless overridden)
+# Font for window titles and bar
 font pango:monospace 12
 
 # =============================================================================
-# WINDOW SETTINGS
+# WINDOW SETTINGS  
 # =============================================================================
-# Border and gap settings
+# Borders
 default_border none
 default_floating_border none
+
+# Gaps
 gaps inner 15
 
 # Window colors
-# class                 border    bground   text      indicator   child_border
-client.focused          #6272A4   #6272A4   #F8F8F2   #6272A4     #6272A4
-client.focused_inactive #44475A   #44475A   #F8F8F2   #44475A     #44475A
-client.unfocused        #282A36   #282A36   #BFBFBF   #282A36     #282A36
-client.urgent           #44475A   #FF5555   #F8F8F2   #FF5555     #FF5555
-client.placeholder      #282A36   #282A36   #F8F8F2   #282A36     #282A36
+# class                 border    backgr.   text      indicator child_border
+client.focused          #6272A4   #6272A4   #F8F8F2   #6272A4   #6272A4
+client.focused_inactive #44475A   #44475A   #F8F8F2   #44475A   #44475A  
+client.unfocused        #282A36   #282A36   #BFBFBF   #282A36   #282A36
+client.urgent           #44475A   #FF5555   #F8F8F2   #FF5555   #FF5555
+client.placeholder      #282A36   #282A36   #F8F8F2   #282A36   #282A36
 client.background       #F8F8F2
 
 # =============================================================================
@@ -31,11 +36,10 @@ for_window [class="pavucontrol"] floating enable
 # =============================================================================
 # MOUSE SETTINGS
 # =============================================================================
-# Use Mouse+$mod to drag floating windows to their wanted position
+# Use Mouse+$mod to drag floating windows
 floating_modifier $mod
 
-# Move tiling windows via drag & drop by left-clicking into the title bar,
-# or left-clicking anywhere into the window while holding the floating modifier
+# Move tiling windows via drag & drop
 tiling_drag modifier titlebar
 
 # =============================================================================
@@ -46,7 +50,7 @@ tiling_drag modifier titlebar
 bindsym XF86AudioMute exec pactl set-sink-mute @DEFAULT_SINK@ toggle
 bindsym XF86AudioMute --release exec pkill -RTMIN+1 i3blocks
 bindsym XF86AudioLowerVolume exec pactl set-sink-mute @DEFAULT_SINK@ 0 && exec pactl set-sink-volume @DEFAULT_SINK@ -5%
-bindsym XF86AudioLowerVolume --release exec pkill -RTMIN+1 i3blocks
+bindsym XF86AudioLowerVolume --release exec pkill -RTMIN+1 i3blocks  
 bindsym XF86AudioRaiseVolume exec pactl set-sink-mute @DEFAULT_SINK@ 0 && exec pactl set-sink-volume @DEFAULT_SINK@ +5%
 bindsym XF86AudioRaiseVolume --release exec pkill -RTMIN+1 i3blocks
 
@@ -74,7 +78,7 @@ bindsym $mod+Down focus down
 bindsym $mod+Up focus up
 bindsym $mod+Right focus right
 
-# Window movement
+# Window movement  
 bindsym $mod+Shift+h move left
 bindsym $mod+Shift+j move down
 bindsym $mod+Shift+k move up
@@ -104,19 +108,10 @@ bindsym $mod+a focus parent
 # WORKSPACES
 # =============================================================================
 # Workspace definitions
-# Workspace 1 - General
 set $ws1 "1: "
-
-# Workspace 2 - Research
 set $ws2 "2: "
-
-# Workspace 3 - Development
 set $ws3 "3: "
-
-# Workspace 4 - Communication
 set $ws4 "4: "
-
-# Workspace 5 - Other
 set $ws5 "5"
 
 # Workspace switching
@@ -137,10 +132,10 @@ bindsym $mod+Shift+5 move container to workspace number $ws5
 # Move workspace to output
 bindsym $mod+x move workspace to output next
 
-# Assign workspaces to monitors
+# Workspace monitor assignment
 workspace $ws4 output DP-0
 
-# Assignments applications to workspaces
+# Application workspace assignment
 assign [class="Spotify"] $ws1
 assign [class="discord"] $ws4
 
@@ -148,24 +143,19 @@ assign [class="discord"] $ws4
 # MODES
 # =============================================================================
 mode "resize" {
-    # These bindings trigger as soon as you enter the resize mode
-
-    # Pressing left will shrink the window's width.
-    # Pressing right will grow the window's width.
-    # Pressing up will shrink the window's height.
-    # Pressing down will grow the window's height.
+    # Vim keys
     bindsym j resize shrink width 10 px or 10 ppt
     bindsym k resize grow height 10 px or 10 ppt
     bindsym l resize shrink height 10 px or 10 ppt
     bindsym oslash resize grow width 10 px or 10 ppt
 
-    # same bindings, but for the arrow keys
+    # Arrow keys
     bindsym Left resize shrink width 10 px or 10 ppt
     bindsym Down resize grow height 10 px or 10 ppt
     bindsym Up resize shrink height 10 px or 10 ppt
     bindsym Right resize grow width 10 px or 10 ppt
 
-    # back to normal: Enter or Escape or $mod+r
+    # Exit resize mode
     bindsym Return mode "default"
     bindsym Escape mode "default"
     bindsym $mod+r mode "default"
@@ -176,15 +166,15 @@ bindsym $mod+r mode "resize"
 # =============================================================================
 # SYSTEM CONTROLS
 # =============================================================================
-# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
-bindsym $mod+Shift+r restart 
-# exit i3 (logs you out of your X session)
+# Restart i3 inplace
+bindsym $mod+Shift+r restart
+
+# Exit i3
 bindsym $mod+Shift+q exit
 
 # =============================================================================
 # BAR CONFIGURATION
 # =============================================================================
-# Start i3bar to display a workspace bar
 bar {
     status_command i3blocks
     tray_output primary

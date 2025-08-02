@@ -1,31 +1,32 @@
 #!/bin/bash
+set -euo pipefail
 
 # Project file aggregator
-# Combines source files into a single text file for documentation
+# Combines source files into a single text file
 
 # === CONFIGURATION ===
-output_file="project.txt"
+OUTPUT_FILE="project.txt"
 
 # === CLEANUP ===
-# Remove existing output file
-rm -f "${output_file}"
+rm -f "${OUTPUT_FILE}"
 
 # === FILE DISCOVERY ===
-# Find and process eligible files
+echo "Aggregating project files..."
+
 find . \( \
-    -not -path '*/.*/*' \
-    -not -path '*/node_modules/*' \
-    -not -path '*/bin/*' \
-    -not -path '*/obj/*' \
-    -not -path '*/out/*' \
-    -not -path '*/target/*' \
-    -not -path '*/coverage/*' \
-    -not -path '*/.nyc_output/*' \
-    -not -path '*/reports/*' \
-    -not -path '*/logs/*' \
-    -not -path '*/wwwroot/lib/*' \
-    -not -path '*/Migrations/*' \
-    \) -type f \( \
+    -path '*/.*' -prune -o \
+    -path '*/node_modules' -prune -o \
+    -path '*/bin' -prune -o \
+    -path '*/obj' -prune -o \
+    -path '*/out' -prune -o \
+    -path '*/target' -prune -o \
+    -path '*/coverage' -prune -o \
+    -path '*/.nyc_output' -prune -o \
+    -path '*/reports' -prune -o \
+    -path '*/logs' -prune -o \
+    -path '*/wwwroot/lib' -prune -o \
+    -path '*/Migrations' -prune -o \
+    -type f \
     ! -name '*.png' \
     ! -name '*.jpg' \
     ! -name '*.jpeg' \
@@ -41,8 +42,8 @@ find . \( \
     ! -name '*.lock' \
     ! -name '*.log' \
     ! -name '*.env' \
-    ! -name '*.gitignore' \
-    ! -name '*DS_Store*' \
+    ! -name '.gitignore' \
+    ! -name '.DS_Store' \
     ! -name 'package-lock.json' \
     ! -name 'yarn.lock' \
     ! -name 'pnpm-lock.yaml' \
@@ -51,7 +52,7 @@ find . \( \
     ! -name 'Thumbs.db' \
     ! -name '.editorconfig' \
     ! -name '.dockerignore' \
-    ! -name '.eslint*' \
+    ! -name '.eslintrc*' \
     ! -name '.prettierrc*' \
     ! -name '.stylelintrc*' \
     ! -name '*.dll' \
@@ -67,13 +68,14 @@ find . \( \
     ! -name '*.targets' \
     ! -name 'Dockerfile' \
     ! -name 'docker-compose.*' \
-    \) -print | while IFS= read -r file; do
-    # === FILE PROCESSING ===
+    -print \) | while IFS= read -r file; do
+
+    # Process each file
     {
         echo "### ${file}"
         cat "${file}"
         printf "\n\n"
-    } >>"${output_file}"
+    } >>"${OUTPUT_FILE}"
 done
 
-echo "All files have been combined into ${output_file}."
+echo "Files aggregated into ${OUTPUT_FILE}"
