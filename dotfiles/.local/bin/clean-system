@@ -1,65 +1,101 @@
 #!/bin/bash
+set -euo pipefail
 
 # System maintenance utility
 # Cleans package cache, logs, and temporary files
 
 # === PERMISSION CHECK ===
-# Ensure script is not run as root
 if [[ "$(id -u)" -eq 0 ]]; then
-    echo "This script can't be run as root"
+    echo "Error: This script cannot be run as root"
     exit 1
 fi
 
 clear
 
 # === PACKAGE CACHE CLEANUP ===
-# Clear pacman package cache
+echo "Cleaning package cache..."
 sudo pacman -Scc --noconfirm
 
-# Remove orphaned packages
-orphans=$(sudo pacman -Qdtq)
-if [[ -n "${orphans}" ]]; then
-    # shellcheck disable=SC2086
-    sudo pacman -Rns ${orphans}
+# Clean AUR cache
+if command -v yay &>/dev/null; then
+    echo "Cleaning AUR cache..."
+    yay -Scc --noconfirm
 fi
-echo
+
+# Remove orphaned packages
+orphans=$(sudo pacman -Qdtq || true)
+if [[ -n "${orphans}" ]]; then
+    echo "Removing orphaned packages..."
+    # shellcheck disable=SC2086  # We need word splitting
+    sudo pacman -Rns ${orphans} --noconfirm
+fi
 
 # === LOG CLEANUP ===
-# Clear system logs
+echo "Clearing system logs..."
 sudo tee /var/log/wtmp /var/log/btmp </dev/null
+sudo journalctl --rotate
+sudo journalctl --vacuum-time=1s
 
 # === DIRECTORY CLEANUP ===
-# Define directories to clean
-system_directories=(
-    /var/log/journal
-    /var/log/libvirt
+SYSTEM_DIRECTORIES=(
+    "/var/log/journal"
+    "/var/log/libvirt"
+    "/var/tmp"
+    "/var/cache/fontconfig"
 )
 
-user_directories=(
-    ~/.cache
-    ~/.local/pipx/logs
-    ~/.local/share/Trash
-    ~/.local/share/xorg
-    ~/.local/state/mpv
+USER_DIRECTORIES=(
+    # General cache
+    "${HOME}/.cache"
+
+    # Logs and state
+    "${HOME}/.local/pipx/logs"
+    "${HOME}/.local/share/Trash"
+    "${HOME}/.local/share/xorg"
+    "${HOME}/.local/state/mpv"
+    "${HOME}/.local/state/wireplumber"
+    "${HOME}/.local/state/nvim"
+
+    # Development
+    "${HOME}/.npm/_cacache"
+    "${HOME}/.nuget/packages"
+
+    # Thumbnails
+    "${HOME}/.thumbnails"
 )
 
-# Clean directories function
 clean_directories() {
     local directories=("$@")
     for dir in "${directories[@]}"; do
         if [[ -d "${dir}" ]]; then
-            sudo find "${dir}" -mindepth 1 -delete 2>/dev/null || true
+            find "${dir}" -mindepth 1 -delete 2>/dev/null || true
+            echo "Cleaned: ${dir}"
         fi
-        echo "Cleaned ${dir}"
     done
 }
 
 # Execute cleanup
-clean_directories "${system_directories[@]}"
-clean_directories "${user_directories[@]}"
-echo
+echo "Cleaning system directories..."
+for dir in "${SYSTEM_DIRECTORIES[@]}"; do
+    if [[ -d "${dir}" ]]; then
+        sudo find "${dir}" -mindepth 1 -delete 2>/dev/null || true
+        echo "Cleaned: ${dir}"
+    fi
+done
+
+echo "Cleaning user directories..."
+clean_directories "${USER_DIRECTORIES[@]}"
+
+# === NEOVIM CLEANUP ===
+echo "Cleaning Neovim temporary files..."
+find "${HOME}" -type f -name "*.swp" -delete 2>/dev/null || true
+find "${HOME}" -type f -name "*.swo" -delete 2>/dev/null || true
+find "${HOME}" -type f -name "*.swn" -delete 2>/dev/null || true
+find "${HOME}" -type f -name "*~" -delete 2>/dev/null || true
 
 # === HISTORY CLEANUP ===
-# Clear bash history
-cat /dev/null >~/.bash_history && history -c && history -w
-echo "Bash history cleared"
+echo "Clearing bash history..."
+cat /dev/null >"${HOME}/.bash_history"
+history -c && history -w
+
+echo "System cleanup complete!"

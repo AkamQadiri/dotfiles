@@ -1,23 +1,58 @@
 #!/bin/bash
+set -euo pipefail
 
-HOST=""
-NODE="pve"
-COMMAND=$1
-VM_ID=$2
-USERNAME="script@pve"
-PASSWORD=""
-API_BASE="https://$HOST/api2/json"
-API_RESOURCE="nodes/$NODE/qemu/$VM_ID/status/$COMMAND"
-API_TICKET_URL="${API_BASE}/access/ticket"
+# Proxmox VE VM control script
+# Controls VM power state via Proxmox API
 
-if [[ "$COMMAND" != "start" && "$COMMAND" != "shutdown" && "$COMMAND" != "reboot" ]]; then
-    echo "$COMMAND is not a valid argument."
-    echo "Valid arguments are: 'start', 'shutdown' or 'reboot'."
+# === CONFIGURATION ===
+# TODO: Move credentials to environment variables or config file
+HOST="${PVE_HOST:-}"
+NODE="${PVE_NODE:-pve}"
+USERNAME="${PVE_USERNAME:-script@pve}"
+PASSWORD="${PVE_PASSWORD:-}"
+
+# === VALIDATION ===
+if [[ -z "${HOST}" ]] || [[ -z "${PASSWORD}" ]]; then
+    echo "Error: PVE_HOST and PVE_PASSWORD must be set"
     exit 1
 fi
 
-TICKET_DATA=$(curl -s --insecure --data "username=${USERNAME}&password=${PASSWORD}" "${API_TICKET_URL}") || exit 1
-TICKET=$(jq -r '.data.ticket' <<<"$TICKET_DATA")
-TOKEN_ID=$(jq -r '.data.CSRFPreventionToken' <<<"$TICKET_DATA")
+COMMAND="${1:-}"
+VM_ID="${2:-}"
 
-curl -s --insecure --cookie "PVEAuthCookie=$TICKET" --header "CSRFPreventionToken:$TOKEN_ID" -X POST "$API_BASE/$API_RESOURCE"
+if [[ -z "${COMMAND}" ]] || [[ -z "${VM_ID}" ]]; then
+    echo "Usage: $(basename "$0") <start|shutdown|reboot> <vm_id>"
+    exit 1
+fi
+
+if [[ ! "${COMMAND}" =~ ^(start|shutdown|reboot)$ ]]; then
+    echo "Error: Invalid command '${COMMAND}'"
+    echo "Valid commands: start, shutdown, reboot"
+    exit 1
+fi
+
+# === API CONFIGURATION ===
+API_BASE="https://${HOST}/api2/json"
+API_RESOURCE="nodes/${NODE}/qemu/${VM_ID}/status/${COMMAND}"
+API_TICKET_URL="${API_BASE}/access/ticket"
+
+# === AUTHENTICATION ===
+echo "Authenticating with Proxmox..."
+TICKET_DATA=$(curl -s --insecure \
+    --data "username=${USERNAME}&password=${PASSWORD}" \
+    "${API_TICKET_URL}") || {
+    echo "Error: Failed to authenticate"
+    exit 1
+}
+
+TICKET=$(jq -r '.data.ticket' <<<"${TICKET_DATA}")
+TOKEN_ID=$(jq -r '.data.CSRFPreventionToken' <<<"${TICKET_DATA}")
+
+# === EXECUTE COMMAND ===
+echo "Sending ${COMMAND} command to VM ${VM_ID}..."
+curl -s --insecure \
+    --cookie "PVEAuthCookie=${TICKET}" \
+    --header "CSRFPreventionToken:${TOKEN_ID}" \
+    -X POST "${API_BASE}/${API_RESOURCE}"
+
+echo "Command sent successfully"

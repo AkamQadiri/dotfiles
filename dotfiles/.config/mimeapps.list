@@ -1,4 +1,24 @@
+# MIME Type Associations
+
 [Default Applications]
+# Web
 x-scheme-handler/http=firefox.desktop
 x-scheme-handler/https=firefox.desktop
+text/html=firefox.desktop
+
+# Documents
 application/pdf=firefox.desktop
+text/plain=nvim.desktop
+
+# Images
+image/png=feh.desktop
+image/jpeg=feh.desktop
+image/gif=feh.desktop
+
+# Video
+video/mp4=mpv.desktop
+video/x-matroska=mpv.desktop
+
+# Audio
+audio/mpeg=mpv.desktop
+audio/flac=mpv.desktop

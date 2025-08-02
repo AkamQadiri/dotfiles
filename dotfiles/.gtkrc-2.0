@@ -1,2 +1,5 @@
+# GTK 2.0 Configuration
+
+# Theme settings
 gtk-theme-name="Dracula"
 gtk-icon-theme-name="Dracula"

@@ -4,20 +4,28 @@
 # Selects random wallpaper from local wallpaper directory
 
 # === CONFIGURATION ===
-WALLPAPER_DIR="$HOME/.local/share/wallpapers"
+WALLPAPER_DIR="${HOME}/.local/share/wallpapers"
 
-# === CHECK DIRECTORY ===
-[ ! -d "$WALLPAPER_DIR" ] && exit 0
+# === VALIDATION ===
+if [ ! -d "${WALLPAPER_DIR}" ]; then
+    exit 0
+fi
 
-# === SELECT RANDOM WALLPAPER ===
-# Find all image files
-IMAGES=$(find "$WALLPAPER_DIR" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) 2>/dev/null)
-[ -z "$IMAGES" ] && exit 0
+# === FILE DISCOVERY ===
+IMAGES=$(find "${WALLPAPER_DIR}" -type f \
+    \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) \
+    2>/dev/null)
 
-# Count images and select random
-COUNT=$(echo "$IMAGES" | wc -l)
-RANDOM_NUM=$(awk -v max="$COUNT" 'BEGIN{srand(); print int(rand()*max)+1}')
-WALLPAPER=$(echo "$IMAGES" | sed -n "${RANDOM_NUM}p")
+if [ -z "${IMAGES}" ]; then
+    exit 0
+fi
+
+# === RANDOM SELECTION ===
+COUNT=$(printf '%s\n' "${IMAGES}" | wc -l)
+RANDOM_NUM=$(awk -v max="${COUNT}" 'BEGIN{srand(); print int(rand()*max)+1}')
+WALLPAPER=$(printf '%s\n' "${IMAGES}" | sed -n "${RANDOM_NUM}p")
 
 # === SET WALLPAPER ===
-[ -n "$WALLPAPER" ] && feh --bg-fill "$WALLPAPER"
+if [ -n "${WALLPAPER}" ]; then
+    feh --bg-fill "${WALLPAPER}"
+fi

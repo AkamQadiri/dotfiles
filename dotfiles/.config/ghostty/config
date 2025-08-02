@@ -1,3 +1,12 @@
+# Ghostty Terminal Configuration
+
+# === APPEARANCE ===
+# Font
+font-family = monospace
 font-size = 14
+
+# Theme
 theme = dracula
+
+# Background
 background-opacity = 0.9
