@@ -8,10 +8,9 @@
     
     # === GEOMETRY ===
     width = 300
-    height = 300
+    height = (0, 300)
     origin = top-right
-    offset = 10x50
-    scale = 0
+    offset = (10,50)
     notification_limit = 0
     
     # === PROGRESS BAR ===
@@ -34,8 +33,10 @@
     horizontal_padding = 10
     text_icon_padding = 0
     
+    # Corner
+    corner_radius = 8
+
     # Gaps
-    gaps = true
     gap_size = 15
     
     # Frame
@@ -74,9 +75,6 @@
     # Alignment
     alignment = left
     vertical_alignment = center
-    
-    # Show age of message
-    show_age_threshold = 60
     
     # Ellipsize
     ellipsize = middle
