@@ -89,6 +89,5 @@ clean_directories "${USER_DIRECTORIES[@]}"
 # === HISTORY CLEANUP ===
 echo "Clearing bash history..."
 cat /dev/null >"${HOME}/.bash_history"
-history -c && history -w
 
 echo "System cleanup complete!"
