@@ -86,13 +86,6 @@ done
 echo "Cleaning user directories..."
 clean_directories "${USER_DIRECTORIES[@]}"
 
-# === NEOVIM CLEANUP ===
-echo "Cleaning Neovim temporary files..."
-find "${HOME}" -type f -name "*.swp" -delete 2>/dev/null || true
-find "${HOME}" -type f -name "*.swo" -delete 2>/dev/null || true
-find "${HOME}" -type f -name "*.swn" -delete 2>/dev/null || true
-find "${HOME}" -type f -name "*~" -delete 2>/dev/null || true
-
 # === HISTORY CLEANUP ===
 echo "Clearing bash history..."
 cat /dev/null >"${HOME}/.bash_history"
