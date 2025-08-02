@@ -5,10 +5,6 @@ separator=false
 separator_block_width=20
 align=center
 
-#[focused-window]
-#interval=persist
-#separator=true
-
 [network-status]
 interval=3
 signal=3
