@@ -11,6 +11,7 @@
     height = (0, 300)
     origin = top-right
     offset = (10,50)
+    scale = 0
     notification_limit = 0
     
     # === PROGRESS BAR ===
@@ -46,6 +47,9 @@
     # === CONTENT ===
     # Sort by urgency
     sort = yes
+
+    # Don't remove messages, if the user is idle for longer than idle_threshold seconds.
+    idle_threshold = 120
     
     # Show age of message
     show_age_threshold = 60
@@ -108,16 +112,16 @@
 # === URGENCY SETTINGS ===
 [urgency_low]
     background = "#282A36"
-    foreground = "#F8F8F2"
+    foreground = "#6272A4"
     timeout = 10
 
 [urgency_normal]
     background = "#282A36"
-    foreground = "#F8F8F2"
+    foreground = "#BD93F9"
     timeout = 10
 
 [urgency_critical]
     background = "#FF5555"
     foreground = "#F8F8F2"
-    frame_color = "#FF6E6E"
+    frame_color = "#FF5555"
     timeout = 0
