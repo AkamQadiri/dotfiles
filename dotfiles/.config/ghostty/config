@@ -3,7 +3,7 @@
 # === APPEARANCE ===
 # Font
 font-family = monospace
-font-size = 14
+font-size = 16
 
 # Theme
 theme = dracula
