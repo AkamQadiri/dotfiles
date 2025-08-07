@@ -21,7 +21,7 @@ toggle_rf() {
 # Button 2: Edit this script
 # Button 3: Toggle WiFi on/off
 case ${BLOCK_BUTTON} in
-1) "${TERMINAL}" -e nmtui ;;
+1) "${TERMINAL}" -e "sleep 0.1 && nmtui" ;;
 2) "${TERMINAL}" -e "${EDITOR}" "$0" ;;
 3) toggle_rf ;;
 esac
