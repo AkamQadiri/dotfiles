@@ -10,3 +10,6 @@ theme = dracula
 
 # Background
 background-opacity = 0.9
+
+# Window
+window-decoration = none
