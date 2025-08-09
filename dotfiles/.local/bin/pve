@@ -5,7 +5,6 @@ set -euo pipefail
 # Controls VM power state via Proxmox API
 
 # === CONFIGURATION ===
-# TODO: Move credentials to environment variables or config file
 HOST="${PVE_HOST:-}"
 NODE="${PVE_NODE:-pve}"
 USERNAME="${PVE_USERNAME:-script@pve}"
@@ -13,7 +12,11 @@ PASSWORD="${PVE_PASSWORD:-}"
 
 # === VALIDATION ===
 if [[ -z "${HOST}" ]] || [[ -z "${PASSWORD}" ]]; then
-    echo "Error: PVE_HOST and PVE_PASSWORD must be set"
+    echo "Error: PVE_HOST and PVE_PASSWORD environment variables must be set"
+    echo "Usage: export PVE_HOST='192.168.1.1:8006'"
+    echo "       export PVE_NODE='pve'"
+    echo "       export PVE_USERNAME='script@pve'"
+    echo "       export PVE_PASSWORD='your-password'"
     exit 1
 fi
 
@@ -53,6 +56,6 @@ echo "Sending ${COMMAND} command to VM ${VM_ID}..."
 curl -s --insecure \
     --cookie "PVEAuthCookie=${TICKET}" \
     --header "CSRFPreventionToken:${TOKEN_ID}" \
-    -X POST "${API_BASE}/${API_RESOURCE}"
+    -X POST "${API_BASE}/${API_RESOURCE}" >/dev/null
 
 echo "Command sent successfully"
