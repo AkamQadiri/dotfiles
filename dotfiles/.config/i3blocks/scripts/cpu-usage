@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# CPU usage indicator
+# Shows current CPU usage percentage
+
+# === HANDLE MOUSE CLICKS ===
+# Button 2: Edit this script
+case $BLOCK_BUTTON in
+2) "$TERMINAL" -e "$EDITOR" "$0" ;;
+esac
+
+# === GET CPU USAGE ===
+# Read CPU stats and calculate usage over a small interval
+read -r cpu user nice system idle iowait irq softirq steal guest guest_nice </proc/stat
+
+# Calculate total and idle from first sample
+prevtotal=$((user + nice + system + idle + iowait + irq + softirq + steal))
+previdle=$idle
+
+# Small delay for second sample
+sleep 0.1
+
+# Read CPU stats again
+read -r cpu user nice system idle iowait irq softirq steal guest guest_nice </proc/stat
+
+# Calculate total and idle from second sample
+total=$((user + nice + system + idle + iowait + irq + softirq + steal))
+
+# Calculate differences
+totald=$((total - prevtotal))
+idled=$((idle - previdle))
+
+# Calculate CPU usage percentage
+cpu_usage=$((100 * (totald - idled) / totald))
+
+# === OUTPUT CPU USAGE ===
+echo " $cpu_usage%"
