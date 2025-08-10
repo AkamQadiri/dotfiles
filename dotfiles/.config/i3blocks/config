@@ -5,15 +5,18 @@ separator=false
 separator_block_width=20
 align=center
 
-[network-status]
+[cpu-usage]
 interval=3
-signal=3
 
 [memory-usage]
 interval=3
 
 [disk-usage]
 interval=3
+
+[network-status]
+interval=3
+signal=3
 
 [headset-battery]
 interval=180
