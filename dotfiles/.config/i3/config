@@ -120,9 +120,9 @@ set $ws5 "5"
 bindsym $mod+Tab workspace back_and_forth
 bindsym $mod+1 workspace number $ws1; layout tabbed
 bindsym $mod+2 workspace number $ws2; layout tabbed
-bindsym $mod+3 workspace number $ws3; layout default
+bindsym $mod+3 workspace number $ws3
 bindsym $mod+4 workspace number $ws4; layout tabbed
-bindsym $mod+5 workspace number $ws5; layout default
+bindsym $mod+5 workspace number $ws5
 
 # Move focused container to workspace
 bindsym $mod+Shift+1 move container to workspace number $ws1
