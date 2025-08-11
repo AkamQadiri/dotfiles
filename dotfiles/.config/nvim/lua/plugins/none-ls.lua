@@ -1,10 +1,31 @@
 return {
     "nvimtools/none-ls.nvim",
-    dependencies = { "nvim-lua/plenary.nvim" },
+    dependencies = {
+        "nvim-lua/plenary.nvim",
+        "williamboman/mason.nvim",
+        "jay-babu/mason-null-ls.nvim",
+    },
     event = { "BufReadPre", "BufNewFile" },
     config = function()
         local null_ls = require("null-ls")
 
+        -- Setup mason-null-ls first
+        require("mason-null-ls").setup({
+            ensure_installed = {
+                "prettier",
+                "stylua",
+                "shfmt",
+                "sql-formatter",
+                "cmake-format",
+                "clang-format",
+                "dotnet-format",
+                "eslint_d",
+                "npm-groovy-lint",
+            },
+            automatic_installation = true,
+        })
+
+        -- Setup none-ls
         null_ls.setup({
             sources = {
                 null_ls.builtins.formatting.prettier,
