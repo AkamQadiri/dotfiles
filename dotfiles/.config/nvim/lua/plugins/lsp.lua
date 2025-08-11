@@ -84,8 +84,27 @@ return {
 
             vim.api.nvim_create_autocmd("BufWritePre", {
                 pattern = "*",
-                callback = function()
-                    vim.lsp.buf.format({ async = false })
+                callback = function(args)
+                    if vim.b[args.buf].disable_autoformat then
+                        return -- Skip formatting for this buffer
+                    end
+
+                    vim.lsp.buf.format({
+                        async = false,
+                        filter = function(client)
+                            -- Prefer null-ls if it supports formatting for this buffer
+                            local has_null_ls = #vim.lsp.get_active_clients({
+                                bufnr = args.buf,
+                                name = "null-ls",
+                            }) > 0
+
+                            if has_null_ls then
+                                return client.name == "null-ls"
+                            else
+                                return client.supports_method("textDocument/formatting")
+                            end
+                        end,
+                    })
                 end,
             })
         end,
