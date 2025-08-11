@@ -3,79 +3,157 @@ set -euo pipefail
 
 # Project file aggregator
 # Combines source files into a single text file
+# Respects .gitignore patterns and excludes binary files
 
 # === CONFIGURATION ===
 OUTPUT_FILE="project.txt"
+
+# === FUNCTIONS ===
+is_text_file() {
+    local file="$1"
+
+    # Check if file exists and is readable
+    [[ ! -f "${file}" || ! -r "${file}" ]] && return 1
+
+    # Skip empty files
+    [[ ! -s "${file}" ]] && return 1
+
+    # Use file command to detect text files
+    file_type=$(file -b --mime-type "${file}" 2>/dev/null || echo "")
+
+    # Check if file is text-based
+    case "${file_type}" in
+    text/* | application/json | application/xml | application/javascript | \
+        application/x-httpd-php | application/x-sh | application/x-perl | \
+        application/x-python | application/x-ruby | application/sql | \
+        application/x-yaml | application/toml | application/x-tex | \
+        application/x-csh | application/x-awk | application/x-sed)
+        return 0
+        ;;
+    *)
+        # Additional check for common source files without proper MIME
+        case "${file}" in
+        Dockerfile | dockerfile | Makefile | makefile | GNUmakefile | CMakeLists.txt | pom.xml | \
+            *.txt | *.md | *.markdown | *.rst | *.adoc | *.tex | \
+            *.sh | *.bash | *.zsh | *.fish | *.ksh | *.csh | \
+            *.py | *.pyw | *.pyx | *.pyi | \
+            *.js | *.mjs | *.cjs | *.ts | *.tsx | *.jsx | \
+            *.gradle.kts | *.java | *.kt | *.kts | *.scala | *.groovy | *.clj | \
+            *.c | *.h | *.cpp | *.hpp | *.cc | *.cxx | *.c++ | *.hxx | \
+            *.cs | *.fs | *.vb | \
+            *.swift | *.m | *.mm | \
+            *.rs | *.go | *.zig | *.nim | *.d | *.dart | \
+            *.rb | *.rake | *.gemspec | *.ru | \
+            *.php | *.phtml | *.php3 | *.php4 | *.php5 | *.php7 | *.phps | \
+            *.pl | *.pm | *.t | *.pod | \
+            *.lua | *.vim | *.vimrc | *.el | *.lisp | *.scm | \
+            *.r | *.R | *.Rmd | *.jl | *.mat | \
+            *.html | *.htm | *.xhtml | *.xml | *.svg | \
+            *.css | *.scss | *.sass | *.less | *.styl | \
+            *.json | *.jsonc | *.json5 | *.yaml | *.yml | *.toml | *.ini | *.cfg | *.conf | \
+            *.sql | *.psql | *.mysql | *.plsql | \
+            *.dockerfile | *.dockerignore | \
+            *.makefile | *.cmake | *.pro | *.pri | \
+            *.gradle | *.maven | \
+            *.sln | *.csproj | *.vbproj | *.fsproj | *.proj | \
+            *.vcxproj | *.vcproj | *.props | *.targets | \
+            *.env | .env.* | \
+            *.gitignore | *.gitattributes | *.gitmodules | \
+            *.editorconfig | *.prettierrc | *.eslintrc | \
+            *.babelrc | *.browserslistrc | *.stylelintrc | \
+            *rc)
+            return 0
+            ;;
+        *)
+            return 1
+            ;;
+        esac
+        ;;
+    esac
+}
+
+get_files_from_git() {
+    # Get all tracked files and untracked non-ignored files
+    {
+        git ls-files 2>/dev/null || true
+        git ls-files --others --exclude-standard 2>/dev/null || true
+    } | sort -u
+}
+
+get_files_from_find() {
+    # Fallback to find if not a git repository
+    find . -type f \
+        -not -path '*/\.*' \
+        -not -path '*/node_modules/*' \
+        -not -path '*/vendor/*' \
+        -not -path '*/target/*' \
+        -not -path '*/bin/*' \
+        -not -path '*/obj/*' \
+        -not -path '*/build/*' \
+        -not -path '*/dist/*' \
+        -not -path '*/out/*' \
+        -not -path '*/__pycache__/*' \
+        -not -path '*/venv/*' \
+        -not -path '*/.venv/*' \
+        -not -path '*/env/*' \
+        -not -path '*/.env/*' \
+        2>/dev/null | sed 's|^\./||'
+}
 
 # === CLEANUP ===
 rm -f "${OUTPUT_FILE}"
 
 # === FILE DISCOVERY ===
-echo "Aggregating project files..."
+echo "Discovering project files..."
 
-find . \( \
-    -path '*/.*' -prune -o \
-    -path '*/node_modules' -prune -o \
-    -path '*/bin' -prune -o \
-    -path '*/obj' -prune -o \
-    -path '*/out' -prune -o \
-    -path '*/target' -prune -o \
-    -path '*/coverage' -prune -o \
-    -path '*/.nyc_output' -prune -o \
-    -path '*/reports' -prune -o \
-    -path '*/logs' -prune -o \
-    -path '*/wwwroot/lib' -prune -o \
-    -path '*/Migrations' -prune -o \
-    -type f \
-    ! -name '*.png' \
-    ! -name '*.jpg' \
-    ! -name '*.jpeg' \
-    ! -name '*.gif' \
-    ! -name '*.webp' \
-    ! -name '*.svg' \
-    ! -name '*.ico' \
-    ! -name '*.ttf' \
-    ! -name '*.woff' \
-    ! -name '*.woff2' \
-    ! -name '*.txt' \
-    ! -name '*.json' \
-    ! -name '*.lock' \
-    ! -name '*.log' \
-    ! -name '*.env' \
-    ! -name '.gitignore' \
-    ! -name '.DS_Store' \
-    ! -name 'package-lock.json' \
-    ! -name 'yarn.lock' \
-    ! -name 'pnpm-lock.yaml' \
-    ! -name '*~' \
-    ! -name '*.swp' \
-    ! -name 'Thumbs.db' \
-    ! -name '.editorconfig' \
-    ! -name '.dockerignore' \
-    ! -name '.eslintrc*' \
-    ! -name '.prettierrc*' \
-    ! -name '.stylelintrc*' \
-    ! -name '*.dll' \
-    ! -name '*.exe' \
-    ! -name '*.pdb' \
-    ! -name '*.class' \
-    ! -name '*.jar' \
-    ! -name '*.xproj' \
-    ! -name '*.csproj' \
-    ! -name '*.vbproj' \
-    ! -name '*.fsproj' \
-    ! -name '*.props' \
-    ! -name '*.targets' \
-    ! -name 'Dockerfile' \
-    ! -name 'docker-compose.*' \
-    -print \) | while IFS= read -r file; do
+# Check if we're in a git repository
+if git rev-parse --git-dir >/dev/null 2>&1; then
+    echo "Using git to discover files (respecting .gitignore)..."
+    FILES=$(get_files_from_git)
+else
+    echo "Not a git repository, using find..."
+    FILES=$(get_files_from_find)
+fi
 
-    # Process each file
-    {
-        echo "### ${file}"
-        cat "${file}"
-        printf "\n\n"
-    } >>"${OUTPUT_FILE}"
-done
+# === FILE AGGREGATION ===
+FILE_COUNT=0
+SKIPPED_COUNT=0
 
-echo "Files aggregated into ${OUTPUT_FILE}"
+echo "Aggregating text files..."
+while IFS= read -r file; do
+    # Skip empty lines
+    [[ -z "${file}" ]] && continue
+
+    # Skip if file doesn't exist or is the output file
+    [[ ! -f "${file}" ]] && continue
+    [[ "${file}" == "${OUTPUT_FILE}" ]] && continue
+
+    # Check if file is text
+    if is_text_file "${file}"; then
+        # Process the file
+        if {
+            echo "===== FILE: ${file} ====="
+            cat "${file}"
+            printf "\n\n"
+        } >>"${OUTPUT_FILE}" 2>/dev/null; then
+            FILE_COUNT=$((FILE_COUNT + 1))
+        else
+            echo "Warning: Failed to process ${file}"
+            SKIPPED_COUNT=$((SKIPPED_COUNT + 1))
+        fi
+    else
+        SKIPPED_COUNT=$((SKIPPED_COUNT + 1))
+    fi
+done <<<"${FILES}"
+
+# === SUMMARY ===
+if [[ ${FILE_COUNT} -eq 0 ]]; then
+    echo "No text files found to aggregate"
+    rm -f "${OUTPUT_FILE}"
+    exit 1
+fi
+
+echo "Aggregation complete!"
+echo "  Files included: ${FILE_COUNT}"
+echo "  Files skipped:  ${SKIPPED_COUNT}"
+echo "  Output file:    ${OUTPUT_FILE}"
