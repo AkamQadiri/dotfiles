@@ -35,7 +35,7 @@ return {
                     "kotlin_language_server",
                     "lua_ls",
                     "marksman", -- Markdown
-                    "pyright",  -- Python
+                    "ruff_lsp", -- Python
                     "sqlls",
                     "lemminx",  -- XML
                     "yamlls",
