@@ -13,12 +13,11 @@ return {
         require("mason-null-ls").setup({
             ensure_installed = {
                 "prettier",
-                "stylua",
                 "shfmt",
                 "sql-formatter",
                 "cmake-format",
-                "clang-format",
                 "dotnet-format",
+                "ruff",
                 "eslint_d",
                 "npm-groovy-lint",
             },
@@ -29,14 +28,12 @@ return {
         null_ls.setup({
             sources = {
                 null_ls.builtins.formatting.prettier,
-                null_ls.builtins.formatting.stylua,
                 null_ls.builtins.formatting.shfmt,
                 null_ls.builtins.formatting.sql_formatter,
                 null_ls.builtins.formatting.cmake_format,
                 null_ls.builtins.formatting.dotnet_format,
-                null_ls.builtins.formatting.clang_format.with({
-                    filetypes = { "arduino" },
-                }),
+                null_ls.builtins.formatting.ruff,
+                null_ls.builtins.diagnostics.ruff,
                 null_ls.builtins.formatting.npm_groovy_lint,
                 null_ls.builtins.diagnostics.eslint_d,
                 null_ls.builtins.code_actions.eslint_d,
