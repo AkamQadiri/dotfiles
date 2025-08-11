@@ -14,6 +14,7 @@ return {
             ensure_installed = {
                 "prettier",
                 "shfmt",
+                "shellcheck",
                 "sql-formatter",
                 "cmake-format",
                 "dotnet-format",
@@ -29,6 +30,7 @@ return {
             sources = {
                 null_ls.builtins.formatting.prettier,
                 null_ls.builtins.formatting.shfmt,
+                null_ls.builtins.diagnostics.shellcheck,
                 null_ls.builtins.formatting.sql_formatter,
                 null_ls.builtins.formatting.cmake_format,
                 null_ls.builtins.formatting.dotnet_format,
