@@ -46,42 +46,6 @@ return {
             local lspconfig = require("lspconfig")
             local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
-            -- Configure each language server
-            local servers = {
-                arduino_language_server = {},
-                bashls = {},
-                clangd = {},
-                omnisharp = {},
-                cmake = {},
-                cssls = {},
-                dockerls = {},
-                groovyls = {},
-                html = {},
-                jdtls = {},
-                ts_ls = {},
-                jsonls = {},
-                kotlin_language_server = {},
-                lua_ls = {
-                    settings = {
-                        Lua = {
-                            diagnostics = {
-                                globals = { "vim" },
-                            },
-                        },
-                    },
-                },
-                marksman = {},
-                pyright = {},
-                sqlls = {},
-                lemminx = {},
-                yamlls = {},
-            }
-
-            for server, config in pairs(servers) do
-                config.capabilities = capabilities
-                lspconfig[server].setup(config)
-            end
-
             vim.api.nvim_create_autocmd("BufWritePre", {
                 pattern = "*",
                 callback = function(args)
