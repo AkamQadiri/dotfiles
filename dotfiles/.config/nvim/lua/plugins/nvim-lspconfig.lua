@@ -11,6 +11,17 @@ return {
 	},
 	event = { "BufReadPre", "BufNewFile" },
 	config = function()
+		vim.diagnostic.config({
+			signs = {
+				text = {
+					[vim.diagnostic.severity.ERROR] = "",
+					[vim.diagnostic.severity.WARN] = "",
+					[vim.diagnostic.severity.HINT] = "",
+					[vim.diagnostic.severity.INFO] = "",
+				},
+			},
+		})
+
 		local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
 		vim.lsp.config("*", {
