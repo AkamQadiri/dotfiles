@@ -1,7 +1,7 @@
 return {
 	"nvim-treesitter/nvim-treesitter",
 	branch = "master",
-	event = { "BufReadPost", "BufNewFile", "BufWritePre" },
+	event = { "BufReadPost", "BufNewFile" },
 	build = ":TSUpdate",
 	opts = {
 		ensure_installed = {
