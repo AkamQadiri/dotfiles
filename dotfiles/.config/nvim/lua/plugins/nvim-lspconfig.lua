@@ -3,7 +3,7 @@ return {
 	dependencies = { "hrsh7th/cmp-nvim-lsp" },
 	keys = {
 		{ "gd", vim.lsp.buf.definition, desc = "Go to definition" },
-		{ "K", vim.lsp.buf.hover, desc = "Hover" },
+		{ "H", vim.lsp.buf.hover, desc = "Hover" },
 		{ "<leader>rn", vim.lsp.buf.rename, desc = "Rename" },
 		{ "<leader>ca", vim.lsp.buf.code_action, desc = "Code action" },
 		{ "gr", vim.lsp.buf.references, desc = "References" },
