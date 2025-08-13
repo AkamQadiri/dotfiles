@@ -5,7 +5,7 @@ return {
 		{ "<leader>gc", ":Git commit<CR>", desc = "Git commit" },
 		{ "<leader>gp", ":Git push<CR>", desc = "Git push" },
 		{ "<leader>gl", ":Git pull<CR>", desc = "Git pull" },
-		{ "<leader>gf", ":Git fetch<CR>", desc = "Git fetch" },
+		{ "<leader>gF", ":Git fetch<CR>", desc = "Git fetch" },
 		{ "<leader>gb", ":Git blame<CR>", desc = "Git blame" },
 		{ "<leader>gd", ":Gvdiffsplit<CR>", desc = "Git diff split" },
 	},
