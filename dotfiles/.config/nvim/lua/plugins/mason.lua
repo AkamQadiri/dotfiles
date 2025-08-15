@@ -2,6 +2,7 @@ return {
 	"williamboman/mason.nvim",
 	dependencies = {
 		"williamboman/mason-lspconfig.nvim",
+		"jay-babu/mason-nvim-dap.nvim",
 		"WhoIsSethDaniel/mason-tool-installer.nvim",
 	},
 	config = function()
@@ -21,18 +22,28 @@ return {
 				"pyright",
 			},
 		})
+		require("mason-nvim-dap").setup({
+			ensure_installed = {
+				"bash-debug-adapter",
+				"codelldb",
+				"debugpy",
+				"js-debug-adapter",
+				"netcoredbg",
+			},
+			handlers = {},
+		})
 		require("mason-tool-installer").setup({
 			ensure_installed = {
 				-- Formatters
-				"prettier",
-				"stylua",
 				"black",
 				"clang-format",
+				"prettier",
 				"shfmt",
+				"stylua",
 
 				-- Linters
-				"shellcheck",
 				"pylint",
+				"shellcheck",
 			},
 		})
 	end,
