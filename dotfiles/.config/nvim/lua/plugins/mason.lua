@@ -24,11 +24,11 @@ return {
 		})
 		require("mason-nvim-dap").setup({
 			ensure_installed = {
-				"bash-debug-adapter",
+				"bash",
 				"codelldb",
-				"debugpy",
-				"js-debug-adapter",
-				"netcoredbg",
+				"coreclr",
+				"js",
+				"python",
 			},
 			handlers = {},
 		})
