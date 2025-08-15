@@ -11,6 +11,14 @@ return {
 	},
 	event = { "BufReadPre", "BufNewFile" },
 	config = function()
+		-- Set rounded borders for all LSP floating windows
+		local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
+		function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
+			opts = opts or {}
+			opts.border = opts.border or "rounded"
+			return orig_util_open_floating_preview(contents, syntax, opts, ...)
+		end
+
 		vim.diagnostic.config({
 			signs = {
 				text = {
@@ -19,11 +27,6 @@ return {
 					[vim.diagnostic.severity.HINT] = "",
 					[vim.diagnostic.severity.INFO] = "",
 				},
-			},
-			float = {
-				border = "rounded",
-				header = "",
-				focusable = false,
 			},
 		})
 
