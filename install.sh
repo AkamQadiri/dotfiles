@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC1091
 set -euo pipefail
 
 # Dotfiles installation and system configuration
@@ -66,7 +67,6 @@ find "${HOME}/.local/bin" -type f -exec chmod u+x {} \; 2>/dev/null || true
 echo "Creating XDG user directories..."
 if [[ -f "${HOME}/.config/user-dirs.dirs" ]]; then
     # Source the file to get variables
-    # shellcheck source=/dev/null
     source "${HOME}/.config/user-dirs.dirs"
 
     # Create each directory
