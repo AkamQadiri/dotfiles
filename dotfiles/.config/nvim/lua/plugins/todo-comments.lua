@@ -3,8 +3,8 @@ return {
 	dependencies = { "nvim-lua/plenary.nvim" },
 	event = { "BufReadPost", "BufNewFile" },
 	keys = {
-		{ "<leader>tT", "<cmd>Trouble todo toggle<cr>", desc = "Toggle Todo (Trouble)" },
-		{ "<leader>tf", "<cmd>TodoTelescope<cr>", desc = "Todo (Telescope)" },
+		{ "<leader>dt", "<cmd>Trouble todo toggle<cr>", desc = "Toggle TODO list panel" },
+		{ "<leader>ft", "<cmd>TodoTelescope<cr>", desc = "Search TODO comments in project" },
 	},
 	opts = {
 		keywords = {

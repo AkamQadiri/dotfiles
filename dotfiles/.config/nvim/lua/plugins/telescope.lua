@@ -7,32 +7,28 @@ return {
 		{
 			"<leader>ff",
 			"<cmd>Telescope find_files<cr>",
-			desc = "Find files",
+			desc = "Search files by name",
 		},
 		{
-			"<leader>gf",
+			"<leader>fg",
 			"<cmd>Telescope git_files<cr>",
-			desc = "Git files",
+			desc = "Search git-tracked files",
 		},
 		{
 			"<leader>fw",
 			function()
 				local word = vim.fn.expand("<cword>")
-				require("telescope.builtin").grep_string({
-					search = word,
-				})
+				require("telescope.builtin").grep_string({ search = word })
 			end,
-			desc = "Grep current word",
+			desc = "Search cursor word in project",
 		},
 		{
 			"<leader>fW",
 			function()
 				local word = vim.fn.expand("<cWORD>")
-				require("telescope.builtin").grep_string({
-					search = word,
-				})
+				require("telescope.builtin").grep_string({ search = word })
 			end,
-			desc = "Grep current WORD",
+			desc = "Search cursor WORD in project",
 		},
 		{
 			"<leader>fs",
@@ -41,12 +37,12 @@ return {
 					search = vim.fn.input("Grep > "),
 				})
 			end,
-			desc = "Grep search",
+			desc = "Search text in project files",
 		},
 		{
 			"<leader>fh",
 			"<cmd>Telescope help_tags<cr>",
-			desc = "Help tags",
+			desc = "Search help documentation",
 		},
 	},
 }
