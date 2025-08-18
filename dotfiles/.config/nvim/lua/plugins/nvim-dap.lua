@@ -7,60 +7,68 @@ return {
 	},
 	keys = {
 		{
-			"<leader>db",
+			"<F5>",
 			function()
-				require("dapui").toggle()
+				require("dap").continue()
 			end,
-			desc = "Toggle DAP UI",
-		},
-		{
-			"<leader>dr",
-			function()
-				require("dap").repl.open()
-			end,
-			desc = "Open REPL",
-		},
-		{
-			"<F9>",
-			function()
-				require("dap").toggle_breakpoint()
-			end,
-			desc = "Toggle breakpoint",
+			desc = "Start/continue debugging",
 		},
 		{
 			"<S-F5>",
 			function()
 				require("dap").terminate()
 			end,
-			desc = "Terminate debugging",
+			desc = "Stop debugging session",
 		},
 		{
-			"<F5>",
+			"<C-S-F5>",
 			function()
-				require("dap").continue()
+				require("dap").restart()
 			end,
-			desc = "Continue/Start debugging",
+			desc = "Restart debugging session",
 		},
 		{
-			"<F11>",
+			"<F9>",
 			function()
-				require("dap").step_into()
+				require("dap").toggle_breakpoint()
 			end,
-			desc = "Step into",
+			desc = "Toggle breakpoint on current line",
 		},
 		{
-			"<S-F11>",
+			"<S-F9>",
 			function()
-				require("dap").step_out()
+				require("dapui").eval()
 			end,
-			desc = "Step out",
+			desc = "Evaluate expression under cursor",
+			mode = { "n", "v" },
 		},
 		{
 			"<F10>",
 			function()
 				require("dap").step_over()
 			end,
-			desc = "Step over",
+			desc = "Step over current line",
+		},
+		{
+			"<F11>",
+			function()
+				require("dap").step_into()
+			end,
+			desc = "Step into function",
+		},
+		{
+			"<S-F11>",
+			function()
+				require("dap").step_out()
+			end,
+			desc = "Step out of current function",
+		},
+		{
+			"<F12>",
+			function()
+				require("dapui").toggle()
+			end,
+			desc = "Toggle debug UI panels",
 		},
 	},
 	config = function()
@@ -87,4 +95,3 @@ return {
 		end
 	end,
 }
-
