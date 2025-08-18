@@ -31,9 +31,11 @@ return {
 		})
 
 		local capabilities = require("cmp_nvim_lsp").default_capabilities()
+		local root_dir = vim.fn.getcwd()
 
 		vim.lsp.config("*", {
 			capabilities = capabilities,
+			root_dir = root_dir,
 		})
 
 		vim.lsp.config("lua_ls", {
@@ -41,6 +43,16 @@ return {
 				Lua = {
 					diagnostics = {
 						globals = { "vim" },
+					},
+				},
+			},
+		})
+
+		vim.lsp.config("pyright", {
+			settings = {
+				python = {
+					analysis = {
+						diagnosticMode = "workspace",
 					},
 				},
 			},
