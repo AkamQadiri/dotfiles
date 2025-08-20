@@ -2991,7 +2991,6 @@ menu, .menu, .context-menu {
   margin: 4px;
   padding: 2px 0px;
   background-color: #242530;
-  border: 1px solid rgba(25, 26, 34, 0.9);
   font: initial; }
   .csd menu,
   .csd .menu,
