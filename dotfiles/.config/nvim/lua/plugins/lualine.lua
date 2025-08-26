@@ -16,6 +16,17 @@ return {
 			return " " .. table.concat(c, "|")
 		end
 
+		local filename = {
+			"filename",
+			newfile_status = true,
+			symbols = {
+				modified = "⬤",
+				readonly = "",
+				unnamed = "",
+				newfile = "",
+			},
+		}
+
 		require("lualine").setup({
 			options = {
 				theme = "dracula",
@@ -32,16 +43,7 @@ return {
 						icon_only = true,
 						padding = { left = 1, right = 0 },
 					},
-					{
-						"filename",
-						newfile_status = true,
-						symbols = {
-							modified = "⬤",
-							readonly = "",
-							unnamed = "",
-							newfile = "",
-						},
-					},
+					filename,
 				},
 				lualine_c = {
 					{
@@ -67,12 +69,12 @@ return {
 				},
 			},
 			inactive_sections = {
-				lualine_a = { "filename" },
+				lualine_a = { filename },
 				lualine_b = {},
 				lualine_c = {},
 				lualine_x = {},
 				lualine_y = {},
-				lualine_z = { "location" },
+				lualine_z = {},
 			},
 			extensions = { "trouble" },
 		})
