@@ -34,11 +34,80 @@ return {
 		})
 
 		local capabilities = require("cmp_nvim_lsp").default_capabilities()
-		local root_dir = vim.fn.getcwd()
+		local function get_root_dir(bufnr, on_dir)
+			local util = require("lspconfig.util")
+			local fname = vim.api.nvim_buf_get_name(bufnr)
+
+			-- Version control markers
+			local vcs_root = util.find_git_ancestor(fname) or util.root_pattern(".svn", ".hg")(fname)
+
+			if vcs_root then
+				return on_dir(vcs_root)
+			end
+
+			-- Common project markers
+			local project_root = util.root_pattern(
+				-- Build files
+				"Makefile",
+				"makefile",
+				"CMakeLists.txt",
+				"build.gradle",
+				"pom.xml",
+
+				-- Language-specific project files
+				"package.json", -- JS/TS
+				"tsconfig.json", -- TypeScript
+				"jsconfig.json", -- JavaScript
+				".eslintrc.json", -- JS/TS
+				"pyproject.toml", -- Python
+				"setup.py", -- Python
+				"setup.cfg", -- Python
+				"requirements.txt", -- Python
+				"Pipfile", -- Python
+				"*.sln", -- C#/.NET
+				"*.csproj", -- C#/.NET
+				"project.json", -- C#/.NET
+				"platformio.ini", -- Arduino
+				"arduino.json", -- Arduino
+				".clang-format", -- C/C++
+				".clang-tidy", -- C/C++
+				"compile_commands.json", -- C/C++
+				"Cargo.toml", -- Rust
+				"go.mod", -- Go
+
+				-- Config files
+				".luarc.json", -- Lua
+				".luarc.jsonc", -- Lua
+				".stylua.toml", -- Lua
+
+				-- Web projects
+				"index.html", -- HTML projects
+				"tailwind.config.js", -- CSS/Tailwind
+				"postcss.config.js", -- CSS
+
+				-- Documentation
+				"README.md",
+				"readme.md"
+			)(fname)
+
+			if project_root then
+				return on_dir(project_root)
+			end
+
+			-- Fall back to the file's directory
+			local fallback = vim.fn.fnamemodify(fname, ":h")
+
+			if fallback == vim.env.HOME then
+				-- This tells LSP to only analyze this specific file
+				return on_dir(vim.fn.fnamemodify(fname, ":p"))
+			end
+
+			on_dir(fallback)
+		end
 
 		vim.lsp.config("*", {
 			capabilities = capabilities,
-			root_dir = root_dir,
+			root_dir = get_root_dir,
 		})
 
 		vim.lsp.config("lua_ls", {
