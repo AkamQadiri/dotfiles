@@ -32,7 +32,16 @@ return {
 						icon_only = true,
 						padding = { left = 1, right = 0 },
 					},
-					"filename",
+					{
+						"filename",
+						newfile_status = true,
+						symbols = {
+							modified = "⬤",
+							readonly = "",
+							unnamed = "",
+							newfile = "",
+						},
+					},
 				},
 				lualine_c = {
 					{
