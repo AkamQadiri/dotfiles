@@ -18,10 +18,6 @@ interval=3
 interval=3
 signal=3
 
-[headset-battery]
-interval=180
-signal=2
-
 [volume-control]
 interval=once
 signal=1
