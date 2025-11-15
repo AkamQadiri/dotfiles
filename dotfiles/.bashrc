@@ -73,6 +73,22 @@ export PATH="${PATH}:${HOME}/.npm/bin"
 # .NET tools
 export PATH="${PATH}:${HOME}/.dotnet/tools"
 
+# === GIT REPOSITORY MANAGEMENT ===
+# Clone GitHub repository with fuzzy search and preview
+ghclone() {
+    local repo
+    repo=$(
+        {
+            echo "NAME|DESCRIPTION|UPDATED"
+            gh repo list --json nameWithOwner,description,updatedAt |
+                jq -r '.[] | "\(.nameWithOwner)|\(.description)|\(.updatedAt | strptime("%Y-%m-%dT%H:%M:%SZ") | strftime("%d.%m.%Y"))"'
+        } | column -t -s '|' |
+            fzf --header-lines=1 --layout=reverse --preview 'gh repo view {1}' --preview-window=bottom |
+            awk '{print $1}'
+    )
+    [[ -n "${repo}" ]] && gh repo clone "${repo}"
+}
+
 # === ALIASES ===
 # System shortcuts
 alias shutdown='pve shutdown 200'
