@@ -13,3 +13,7 @@ background-opacity = 0.9
 
 # Window
 window-decoration = none
+
+# === BEHAVIOR ===
+# Window
+window-inherit-working-directory = false
