@@ -86,7 +86,10 @@ ghclone() {
             fzf --header-lines=1 --layout=reverse --preview 'gh repo view {1}' --preview-window=bottom |
             awk '{print $1}'
     )
-    [[ -n "${repo}" ]] && gh repo clone "${repo}"
+
+    if [[ -n "${repo}" ]]; then
+        gh repo clone "${repo}" && cd "${repo##*/}" || return
+    fi
 }
 
 # === ALIASES ===
