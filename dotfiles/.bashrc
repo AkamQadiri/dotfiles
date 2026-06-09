@@ -75,7 +75,7 @@ export PATH="${PATH}:${HOME}/.dotnet/tools"
 
 # === GIT REPOSITORY MANAGEMENT ===
 # Clone GitHub repository with fuzzy search and preview
-ghclone() {
+clone-github() {
     local repo
     repo=$(
         {
