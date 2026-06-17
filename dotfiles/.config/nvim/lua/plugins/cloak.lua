@@ -2,7 +2,7 @@ return {
 	"laytan/cloak.nvim",
 	event = { "BufReadPost", "BufNewFile" },
 	keys = {
-		{ "<leader>uc", "<cmd>CloakToggle<cr>", desc = "Show/hide sensitive values" },
+		{ "<leader>us", "<cmd>CloakToggle<cr>", desc = "Show/hide sensitive values" },
 	},
 	config = function()
 		require("cloak").setup({
