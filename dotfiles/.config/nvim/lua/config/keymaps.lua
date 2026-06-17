@@ -52,6 +52,13 @@ plugin am I using?" Place the keymap in the appropriate semantic category.
 
 vim.g.mapleader = " "
 
+-- Own the `gr` namespace: Neovim 0.11 maps gra/gri/grn/grr/grt/grx globally,
+-- which makes our bare `gr` wait on timeoutlen. Our scheme covers these
+-- (gr/gi/gy for nav, <leader>cr / <leader>ca for rename/action), so remove them.
+for _, lhs in ipairs({ "gra", "gri", "grn", "grr", "grt", "grx" }) do
+	pcall(vim.keymap.del, "n", lhs)
+end
+
 -- === BUILT-IN VIM MOTIONS (Keep defaults) ===
 -- Line movement
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move line down" })
@@ -81,9 +88,13 @@ vim.keymap.set(
 )
 
 -- === DIAGNOSTICS (<leader>d*) ===
-vim.keymap.set("n", "<leader>dj", vim.diagnostic.goto_next, { desc = "Jump to next diagnostic" })
-vim.keymap.set("n", "<leader>dk", vim.diagnostic.goto_prev, { desc = "Jump to previous diagnostic" })
-vim.keymap.set("n", "<leader>dd", vim.diagnostic.open_float, { desc = "Show diagnostic details in float" })
+vim.keymap.set("n", "<leader>dj", function()
+	vim.diagnostic.jump({ count = 1 })
+end, { desc = "Jump to next diagnostic" })
+vim.keymap.set("n", "<leader>dk", function()
+	vim.diagnostic.jump({ count = -1 })
+end, { desc = "Jump to previous diagnostic" })
+vim.keymap.set("n", "<leader>df", vim.diagnostic.open_float, { desc = "Show diagnostic details in float" })
 vim.keymap.set("n", "<leader>dl", vim.diagnostic.setloclist, { desc = "Add buffer diagnostics to location list" })
 
 -- === LOCATION LIST (<leader>l*) ===
@@ -100,4 +111,3 @@ vim.keymap.set("n", "<leader>qc", "<cmd>cclose<CR>", { desc = "Close quickfix li
 
 -- === UI/TOOLS (<leader>u*) ===
 vim.keymap.set("n", "<leader>ux", "<cmd>!chmod +x %<CR>", { silent = true, desc = "Make current file executable" })
-

@@ -1,6 +1,16 @@
 return {
 	"stevearc/conform.nvim",
 	event = { "BufWritePre" },
+	keys = {
+		{
+			"<leader>cf",
+			function()
+				require("conform").format({ async = true })
+			end,
+			mode = { "n", "v" },
+			desc = "Format current buffer",
+		},
+	},
 	config = function()
 		require("conform").setup({
 			formatters_by_ft = {
@@ -28,9 +38,9 @@ return {
 				bash = { "shfmt", stop_after_first = true },
 				sh = { "shfmt", stop_after_first = true },
 			},
+			default_format_opts = { lsp_format = "fallback" },
 			format_on_save = {
 				timeout_ms = 500,
-				lsp_fallback = true,
 			},
 		})
 	end,

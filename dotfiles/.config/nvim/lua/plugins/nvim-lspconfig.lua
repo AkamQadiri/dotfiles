@@ -5,12 +5,11 @@ return {
 		{ "gd", vim.lsp.buf.definition, desc = "Jump to definition" },
 		{ "gD", vim.lsp.buf.declaration, desc = "Jump to declaration" },
 		{ "gr", vim.lsp.buf.references, desc = "Show all references in quickfix" },
-		{ "gtd", vim.lsp.buf.type_definition, desc = "Jump to type definition" },
+		{ "gy", vim.lsp.buf.type_definition, desc = "Jump to type definition" },
 		{ "gi", vim.lsp.buf.implementation, desc = "Jump to implementation" },
 		{ "K", vim.lsp.buf.hover, desc = "Show hover documentation" },
 		{ "<leader>cr", vim.lsp.buf.rename, desc = "Rename symbol project-wide" },
 		{ "<leader>ca", vim.lsp.buf.code_action, desc = "Show available code actions" },
-		{ "<leader>cf", vim.lsp.buf.format, desc = "Format current buffer" },
 	},
 	event = { "BufReadPre", "BufNewFile" },
 	config = function()
@@ -31,6 +30,7 @@ return {
 					[vim.diagnostic.severity.INFO] = "",
 				},
 			},
+			jump = { float = true },
 		})
 
 		local capabilities = require("cmp_nvim_lsp").default_capabilities()
