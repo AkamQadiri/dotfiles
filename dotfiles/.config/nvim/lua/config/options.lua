@@ -28,6 +28,8 @@ vim.opt.undofile = true
 -- === SEARCH ===
 vim.opt.hlsearch = false
 vim.opt.incsearch = true
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
 
 -- === PERFORMANCE ===
 vim.opt.updatetime = 50
