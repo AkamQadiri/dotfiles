@@ -7,6 +7,7 @@ vim.opt.wrap = false
 vim.opt.scrolloff = 8
 vim.opt.signcolumn = "yes"
 vim.opt.isfname:append("@-@")
+vim.opt.winborder = "rounded"
 
 -- === LINE NUMBERS & NAVIGATION ===
 vim.opt.nu = true
