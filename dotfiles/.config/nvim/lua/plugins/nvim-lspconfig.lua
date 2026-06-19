@@ -13,14 +13,6 @@ return {
 	},
 	event = { "BufReadPre", "BufNewFile" },
 	config = function()
-		-- Set rounded borders for all LSP floating windows
-		local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
-		function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
-			opts = opts or {}
-			opts.border = opts.border or "rounded"
-			return orig_util_open_floating_preview(contents, syntax, opts, ...)
-		end
-
 		vim.diagnostic.config({
 			signs = {
 				text = {
@@ -30,7 +22,11 @@ return {
 					[vim.diagnostic.severity.INFO] = "",
 				},
 			},
-			jump = { float = true },
+			jump = {
+				on_jump = function(_, bufnr)
+					vim.diagnostic.open_float({ bufnr = bufnr, scope = "cursor", focus = false })
+				end,
+			},
 		})
 
 		local capabilities = require("cmp_nvim_lsp").default_capabilities()

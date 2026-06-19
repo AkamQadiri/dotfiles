@@ -20,4 +20,5 @@ require("lazy").setup({
 	},
 	install = { colorscheme = { "dracula" } },
 	checker = { enabled = false },
+	ui = { border = "rounded" },
 })
