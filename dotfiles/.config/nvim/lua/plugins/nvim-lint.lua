@@ -2,16 +2,18 @@ return {
 	"mfussenegger/nvim-lint",
 	event = { "BufReadPre", "BufNewFile" },
 	config = function()
+		-- bash, c, cpp lint via their LSPs
 		require("lint").linters_by_ft = {
-			bash = { "shellcheck" },
-			sh = { "shellcheck" },
 			javascript = { "eslint" },
 			javascriptreact = { "eslint" },
 			typescript = { "eslint" },
 			typescriptreact = { "eslint" },
-			python = { "pylint" },
-			c = { "clangtidy" },
-			cpp = { "clangtidy" },
+			python = { "ruff" },
+			yaml = { "yamllint" },
+			markdown = { "markdownlint-cli2" },
+			dockerfile = { "hadolint" },
+			sql = { "sqlfluff" }, -- needs a dialect in .sqlfluff
+			make = { "checkmake" },
 		}
 
 		vim.api.nvim_create_autocmd({ "BufWritePost", "BufEnter", "InsertLeave" }, {

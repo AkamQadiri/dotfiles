@@ -14,29 +14,27 @@ return {
 	config = function()
 		require("conform").setup({
 			formatters_by_ft = {
-				-- JS/TS family - prettier → eslint → LSP
-				javascript = { "prettier-eslint", "prettier", "eslint", stop_after_first = true },
-				javascriptreact = { "prettier-eslint", "prettier", "eslint", stop_after_first = true },
-				typescript = { "prettier-eslint", "prettier", "eslint", stop_after_first = true },
-				typescriptreact = { "prettier-eslint", "prettier", "eslint", stop_after_first = true },
+				-- Prettier-supported
+				javascript = { "prettier" },
+				javascriptreact = { "prettier" },
+				typescript = { "prettier" },
+				typescriptreact = { "prettier" },
+				json = { "prettier" },
+				jsonc = { "prettier" },
+				css = { "prettier" },
+				scss = { "prettier" },
+				yaml = { "prettier" },
 
-				-- Prettier-supported - prettier → LSP
-				json = { "prettier", stop_after_first = true },
-				jsonc = { "prettier", stop_after_first = true },
-				css = { "prettier", stop_after_first = true },
-				scss = { "prettier", stop_after_first = true },
-				html = { "prettier", stop_after_first = true },
-				markdown = { "prettier", stop_after_first = true },
-				yaml = { "prettier", stop_after_first = true },
+				html = { "superhtml" }, -- not prettier (self-closes void tags)
 
-				-- Language-specific - formatter → LSP
-				c = { "clang-format", stop_after_first = true },
-				cpp = { "clang-format", stop_after_first = true },
-				arduino = { "clang-format", stop_after_first = true },
-				python = { "black", stop_after_first = true },
-				lua = { "stylua", stop_after_first = true },
-				bash = { "shfmt", stop_after_first = true },
-				sh = { "shfmt", stop_after_first = true },
+				-- Language-specific
+				markdown = { "markdownlint-cli2" },
+				python = { "ruff_organize_imports", "ruff_format" },
+				lua = { "stylua" },
+				bash = { "shfmt" },
+				sh = { "shfmt" },
+				toml = { "taplo" },
+				sql = { "sqlfluff" }, -- needs a dialect in .sqlfluff
 			},
 			default_format_opts = { lsp_format = "fallback" },
 			format_on_save = {
