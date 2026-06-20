@@ -1,6 +1,6 @@
 return {
 	"neovim/nvim-lspconfig",
-	dependencies = { "hrsh7th/cmp-nvim-lsp" },
+	dependencies = { "hrsh7th/cmp-nvim-lsp", "b0o/SchemaStore.nvim" },
 	keys = {
 		{ "gd", vim.lsp.buf.definition, desc = "Jump to definition" },
 		{ "gD", vim.lsp.buf.declaration, desc = "Jump to declaration" },
@@ -41,6 +41,28 @@ return {
 					diagnostics = {
 						globals = { "vim" },
 					},
+				},
+			},
+		})
+
+		-- SchemaStore catalogs for json/yaml
+		vim.lsp.config("jsonls", {
+			settings = {
+				json = {
+					schemas = require("schemastore").json.schemas(),
+					validate = { enable = true },
+				},
+			},
+		})
+
+		vim.lsp.config("yamlls", {
+			settings = {
+				yaml = {
+					schemaStore = {
+						enable = false, -- use SchemaStore.nvim's catalog instead
+						url = "",
+					},
+					schemas = require("schemastore").yaml.schemas(),
 				},
 			},
 		})
