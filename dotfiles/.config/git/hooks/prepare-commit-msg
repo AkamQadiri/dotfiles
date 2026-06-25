@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Pre-fill the commit message with a Claude-generated subject.
+
+# Never override a repo's own hook: core.hooksPath routes every repo here, so
+# hand off to a repo-local hook when one exists. --git-common-dir finds the
+# shared hooks dir (worktree-safe); -ef stops us handing off to ourselves.
+local_hook="$(git rev-parse --git-common-dir 2>/dev/null)/hooks/prepare-commit-msg"
+if [ -x "$local_hook" ] && ! [ "$local_hook" -ef "$0" ]; then
+    exec "$local_hook" "$@"
+fi
+
+[ -n "$2" ] && exit 0 # only fill a from-scratch commit; $2 is set for -m/template/merge/squash/amend
+[ -n "$NO_AI_COMMIT" ] && exit 0
+command -v claude >/dev/null 2>&1 || exit 0 # absent claude must not block the commit
+
+diff=$(git diff --cached --function-context) # whole enclosing function, so in-function edits read clearly
+[ -z "$diff" ] && exit 0
+
+recent=$(git log -n 20 --pretty=format:'%s' 2>/dev/null) # style examples for the prompt
+
+instructions="Write a single commit message line for the staged diff piped on stdin.
+Use Conventional Commits: type(scope): description. type is one of feat, fix, chore, refactor, docs, style, perf, test. scope is the area changed, e.g. nvim, bash, or a plugin name.
+Keep the description lowercase, imperative, no trailing period, under ~70 characters. Output only the line: no quotes, no code fences, no explanation.
+Match the style of these recent subjects:
+$recent"
+
+msg=$(printf '%s' "$diff" | timeout 20 claude --model haiku -p "$instructions" 2>/dev/null) || exit 0
+
+# models sometimes fence or quote the line; take the first real line, unwrapped
+msg=$(printf '%s\n' "$msg" |
+    grep -v '^[[:space:]]*```' |
+    grep -m1 '[^[:space:]]' |
+    sed -E "s/^[[:space:]\"'\`]+//; s/[[:space:]\"'\`]+\$//")
+[ -z "$msg" ] && exit 0
+
+printf '%s\n\n%s' "$msg" "$(cat "$1")" >"$1" # prepend; keep git's template/comments below
