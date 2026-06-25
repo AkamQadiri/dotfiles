@@ -1,0 +1,4 @@
+# Point every repo at one hooks dir. core.hooksPath normally hides a repo's
+# own .git/hooks, but the hooks here delegate to it (see prepare-commit-msg).
+[core]
+	hooksPath = ~/.config/git/hooks
