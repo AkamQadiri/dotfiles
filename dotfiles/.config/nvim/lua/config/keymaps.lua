@@ -52,7 +52,7 @@ plugin am I using?" Place the keymap in the appropriate semantic category.
 
 vim.g.mapleader = " "
 
--- Own the `gr` namespace: Neovim 0.11 maps gra/gri/grn/grr/grt/grx globally,
+-- Own the `gr` namespace: Neovim maps gra/gri/grn/grr/grt/grx globally,
 -- which makes our bare `gr` wait on timeoutlen. Our scheme covers these
 -- (gr/gi/gy for nav, <leader>cr / <leader>ca for rename/action), so remove them.
 for _, lhs in ipairs({ "gra", "gri", "grn", "grr", "grt", "grx" }) do
