@@ -16,16 +16,48 @@ return {
 			return " " .. table.concat(c, "|")
 		end
 
-		local filename = {
-			"filename",
-			newfile_status = true,
-			symbols = {
-				modified = "⬤",
-				readonly = "",
-				unnamed = "",
-				newfile = "",
-			},
+		local icons = {
+			modified = "⬤",
+			readonly = "",
+			newfile = "",
+			unnamed = "",
 		}
+
+		--- Filename plus status symbols, space-separated so the icons never touch
+		--- (lualine's built-in filename component joins them with no separator).
+		local function filename()
+			local full = vim.fn.expand("%")
+			local name = vim.fn.fnamemodify(full, ":t")
+			if name == "" then
+				name = icons.unnamed
+			else
+				name = name:gsub("%%", "%%%%") -- escape statusline specials
+			end
+
+			-- Status symbols only apply to real, file-backed buffers; skip them for
+			-- help, terminals, quickfix, and plugin scratch buffers.
+			if vim.bo.buftype ~= "" then
+				return name
+			end
+
+			local symbols = {}
+			-- A new file is inherently unsaved, so show the new-file icon or the
+			-- modified dot, not both.
+			if full ~= "" and vim.uv.fs_stat(full) == nil then
+				table.insert(symbols, icons.newfile)
+			elseif vim.bo.modified then
+				table.insert(symbols, icons.modified)
+			end
+
+			if not vim.bo.modifiable or vim.bo.readonly then
+				table.insert(symbols, icons.readonly)
+			end
+
+			if #symbols == 0 then
+				return name
+			end
+			return name .. " " .. table.concat(symbols, " ")
+		end
 
 		require("lualine").setup({
 			options = {
