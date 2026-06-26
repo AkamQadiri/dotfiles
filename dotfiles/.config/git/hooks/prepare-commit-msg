@@ -24,7 +24,21 @@ Keep the description lowercase, imperative, no trailing period, under ~70 charac
 Match the style of these recent subjects:
 $recent"
 
-msg=$(printf '%s' "$diff" | timeout 20 claude --model haiku -p "$instructions" 2>/dev/null) || exit 0
+# Strip all that isn't needed to emit one line, for fast startup and fewer
+# tokens: our system prompt replaces the default, and tools, auto memory, and
+# MCP are off (--strict-mcp-config for local servers, the env var for claude.ai-
+# hosted). None of this drops auth, unlike --bare.
+export CLAUDE_CODE_DISABLE_AUTO_MEMORY=1 ENABLE_CLAUDEAI_MCP_SERVERS=false
+
+claude_args=(
+    --model haiku
+    --strict-mcp-config --mcp-config '{"mcpServers":{}}'
+    --tools ""
+    --system-prompt "$instructions"
+    -p
+)
+
+msg=$(printf '%s' "$diff" | timeout 20 claude "${claude_args[@]}" 2>/dev/null) || exit 0
 
 # models sometimes fence or quote the line; take the first real line, unwrapped
 msg=$(printf '%s\n' "$msg" |
