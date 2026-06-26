@@ -38,6 +38,7 @@ sudo journalctl --vacuum-time=1s
 
 # === DIRECTORY CLEANUP ===
 SYSTEM_DIRECTORIES=(
+    "/var/lib/systemd/coredump"
     "/var/log/journal"
     "/var/log/libvirt"
     "/var/tmp"
@@ -48,17 +49,30 @@ USER_DIRECTORIES=(
     # General cache
     "${HOME}/.cache"
 
+    # GPU shader caches
+    "${HOME}/.nv/GLCache"
+    "${HOME}/.nv/ComputeCache"
+
+    # Discord: Electron caches only
+    "${HOME}/.config/discord/Cache"
+    "${HOME}/.config/discord/Code Cache"
+    "${HOME}/.config/discord/GPUCache"
+
     # Logs and state
     "${HOME}/.local/pipx/logs"
     "${HOME}/.local/share/Trash"
     "${HOME}/.local/share/xorg"
+    "${HOME}/.local/state/git"
     "${HOME}/.local/state/mpv"
     "${HOME}/.local/state/wireplumber"
     "${HOME}/.local/state/nvim"
 
     # Development
     "${HOME}/.npm/_cacache"
+    "${HOME}/.npm/_logs"
+    "${HOME}/.npm/_npx"
     "${HOME}/.nuget/packages"
+    "${HOME}/.local/share/NuGet"
 
     # Thumbnails
     "${HOME}/.thumbnails"
@@ -87,7 +101,8 @@ echo "Cleaning user directories..."
 clean_directories "${USER_DIRECTORIES[@]}"
 
 # === HISTORY CLEANUP ===
-echo "Clearing bash history..."
+echo "Clearing shell and REPL history..."
 cat /dev/null >"${HOME}/.bash_history"
+rm -f "${HOME}/.lesshst" "${HOME}/.python_history" "${HOME}/.node_repl_history"
 
 echo "System cleanup complete!"
