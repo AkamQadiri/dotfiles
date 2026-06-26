@@ -1,20 +1,48 @@
 #!/usr/bin/env bash
 # Pre-fill the commit message with a Claude-generated subject.
 
+log_file="${XDG_STATE_HOME:-$HOME/.local/state}/git/prepare-commit-msg.log"
+log_max=$((256 * 1024))                           # past this the log rotates to a .1 backup, so it stays bounded
+repo=$(git rev-parse --show-toplevel 2>/dev/null) # one log file serves every repo, so record which
+
+# best-effort: a logging failure must never block the commit
+log() {
+    local size=0
+    mkdir -p "${log_file%/*}" 2>/dev/null || return 0
+    [ -f "$log_file" ] && size=$(wc -c <"$log_file" 2>/dev/null) # guard the read: an absent log must not leak an open error past 2>/dev/null
+    # rotate by rename past the cap: atomic, so a parallel commit can't lose
+    # lines, and a fresh log just starts the count over.
+    [ "${size:-0}" -gt "$log_max" ] && mv -f "$log_file" "$log_file.1" 2>/dev/null
+    printf '%s [%s] %s\n' "$(date '+%F %T')" "${repo:-?}" "$*" >>"$log_file" 2>/dev/null || true
+}
+
 # Never override a repo's own hook: core.hooksPath routes every repo here, so
 # hand off to a repo-local hook when one exists. --git-common-dir finds the
 # shared hooks dir (worktree-safe); -ef stops us handing off to ourselves.
 local_hook="$(git rev-parse --git-common-dir 2>/dev/null)/hooks/prepare-commit-msg"
 if [ -x "$local_hook" ] && ! [ "$local_hook" -ef "$0" ]; then
+    log "handoff to repo hook: $local_hook"
     exec "$local_hook" "$@"
 fi
 
-[ -n "$2" ] && exit 0 # only fill a from-scratch commit; $2 is set for -m/template/merge/squash/amend
-[ -n "$NO_AI_COMMIT" ] && exit 0
-command -v claude >/dev/null 2>&1 || exit 0 # absent claude must not block the commit
+[ -n "$2" ] && {
+    log "skip: message source ($2)"
+    exit 0
+} # $2 is set for -m/template/merge/squash/amend
+[ -n "$NO_AI_COMMIT" ] && {
+    log "skip: NO_AI_COMMIT set"
+    exit 0
+}
+command -v claude >/dev/null 2>&1 || {
+    log "skip: claude not on PATH"
+    exit 0
+}
 
 diff=$(git diff --cached --function-context) # whole enclosing function, so in-function edits read clearly
-[ -z "$diff" ] && exit 0
+[ -z "$diff" ] && {
+    log "skip: empty staged diff"
+    exit 0
+}
 
 recent=$(git log -n 20 --pretty=format:'%s' 2>/dev/null) # style examples for the prompt
 
@@ -38,13 +66,25 @@ claude_args=(
     -p
 )
 
-msg=$(printf '%s' "$diff" | timeout 20 claude "${claude_args[@]}" 2>/dev/null) || exit 0
+err=$(mktemp 2>/dev/null || echo /dev/null) # capture stderr so a failure is logged, not swallowed
+trap '[ "$err" != /dev/null ] && rm -f "$err"' EXIT
+msg=$(printf '%s' "$diff" | timeout 20 claude "${claude_args[@]}" 2>"$err")
+status=$?
+if [ "$status" -ne 0 ]; then # 124 = timeout; others are claude/auth/network errors
+    log "claude failed (exit $status): $(tr '\n' ' ' <"$err" 2>/dev/null | cut -c1-500)"
+    exit 0
+fi
 
 # models sometimes fence or quote the line; take the first real line, unwrapped
 msg=$(printf '%s\n' "$msg" |
     grep -v '^[[:space:]]*```' |
     grep -m1 '[^[:space:]]' |
     sed -E "s/^[[:space:]\"'\`]+//; s/[[:space:]\"'\`]+\$//")
-[ -z "$msg" ] && exit 0
+[ -z "$msg" ] && {
+    log "claude returned no usable line"
+    exit 0
+}
 
 printf '%s\n\n%s' "$msg" "$(cat "$1")" >"$1" # prepend; keep git's template/comments below
+log "ok: $msg"
+exit 0
