@@ -2,7 +2,24 @@
 set -euo pipefail
 
 # System maintenance utility
-# Cleans package cache, logs, and temporary files
+# Cleans package cache, logs, and temporary files.
+
+# === ARGUMENTS ===
+DRY_RUN=false
+case "${1:-}" in
+-n | --dry-run) DRY_RUN=true ;;
+-h | --help)
+    echo "Usage: ${0##*/} [-n|--dry-run]"
+    echo "  -n, --dry-run   List what would be removed without deleting anything"
+    exit 0
+    ;;
+"") ;;
+*)
+    echo "Unknown option: $1" >&2
+    echo "Usage: ${0##*/} [-n|--dry-run]" >&2
+    exit 1
+    ;;
+esac
 
 # === PERMISSION CHECK ===
 if [[ "$(id -u)" -eq 0 ]]; then
@@ -10,31 +27,73 @@ if [[ "$(id -u)" -eq 0 ]]; then
     exit 1
 fi
 
-clear
+# === HELPERS ===
+# Run a command, or print it under --dry-run instead of executing.
+run() {
+    if [[ "${DRY_RUN}" == true ]]; then
+        echo "Would run: $*"
+    else
+        "$@"
+    fi
+}
+
+# Delete a directory's contents, or list them under --dry-run, leaving the
+# directory itself in place. $1 is "sudo" for system dirs or "" for user dirs.
+clean_dir() {
+    local privilege="$1" dir="$2"
+    [[ -d "${dir}" ]] || return 0
+
+    local -a cmd=(find "${dir}" -mindepth 1)
+    if [[ "${DRY_RUN}" != true ]]; then
+        cmd+=(-delete)
+    fi
+    if [[ "${privilege}" == sudo ]]; then
+        cmd=(sudo "${cmd[@]}")
+    fi
+
+    if [[ "${DRY_RUN}" == true ]]; then
+        echo "Would clean: ${dir}"
+        "${cmd[@]}" || true
+    elif "${cmd[@]}" 2>/dev/null; then
+        echo "Cleaned: ${dir}"
+    else
+        echo "Cleaned: ${dir} (some items skipped)"
+    fi
+}
+
+if [[ "${DRY_RUN}" == true ]]; then
+    echo "DRY RUN: showing what would be removed; nothing will be deleted."
+else
+    clear 2>/dev/null || true
+fi
 
 # === PACKAGE CACHE CLEANUP ===
 echo "Cleaning package cache..."
-sudo pacman -Scc --noconfirm
+run sudo pacman -Scc --noconfirm
 
 # Clean AUR cache
 if command -v yay &>/dev/null; then
     echo "Cleaning AUR cache..."
-    yay -Scc --noconfirm
+    run yay -Scc --noconfirm
 fi
 
 # Remove orphaned packages
-orphans=$(sudo pacman -Qdtq || true)
+orphans=$(pacman -Qdtq || true)
 if [[ -n "${orphans}" ]]; then
     echo "Removing orphaned packages..."
     # shellcheck disable=SC2086  # We need word splitting
-    sudo pacman -Rns ${orphans} --noconfirm
+    run sudo pacman -Rns ${orphans} --noconfirm
 fi
 
 # === LOG CLEANUP ===
 echo "Clearing system logs..."
-sudo tee /var/log/wtmp /var/log/btmp </dev/null
-sudo journalctl --rotate
-sudo journalctl --vacuum-time=1s
+if [[ "${DRY_RUN}" == true ]]; then
+    echo "Would clear: /var/log/wtmp /var/log/btmp"
+else
+    sudo tee /var/log/wtmp /var/log/btmp </dev/null
+fi
+run sudo journalctl --rotate
+run sudo journalctl --vacuum-time=1s
 
 # === DIRECTORY CLEANUP ===
 SYSTEM_DIRECTORIES=(
@@ -52,11 +111,18 @@ USER_DIRECTORIES=(
     # GPU shader caches
     "${HOME}/.nv/GLCache"
     "${HOME}/.nv/ComputeCache"
+    "${HOME}/.config/chromium/GPUPersistentCache"
+    "${HOME}/.config/chromium/GraphiteDawnCache"
+    "${HOME}/.config/chromium/GrShaderCache"
+    "${HOME}/.config/chromium/ShaderCache"
 
     # Discord: Electron caches only
     "${HOME}/.config/discord/Cache"
     "${HOME}/.config/discord/Code Cache"
     "${HOME}/.config/discord/GPUCache"
+    "${HOME}/.config/discord/DawnGraphiteCache"
+    "${HOME}/.config/discord/DawnWebGPUCache"
+    "${HOME}/.config/discord/discord_asset_cache"
 
     # Logs and state
     "${HOME}/.local/pipx/logs"
@@ -73,36 +139,39 @@ USER_DIRECTORIES=(
     "${HOME}/.npm/_npx"
     "${HOME}/.nuget/packages"
     "${HOME}/.local/share/NuGet"
+    "${HOME}/.m2/repository"
+    "${HOME}/.templateengine"
+    "${HOME}/.lemminx/cache"
+    "${HOME}/.expo/native-modules-cache"
+    "${HOME}/.expo/schema-cache"
+    "${HOME}/.expo/versions-cache"
 
     # Thumbnails
     "${HOME}/.thumbnails"
 )
 
-clean_directories() {
-    local directories=("$@")
-    for dir in "${directories[@]}"; do
-        if [[ -d "${dir}" ]]; then
-            find "${dir}" -mindepth 1 -delete 2>/dev/null || true
-            echo "Cleaned: ${dir}"
-        fi
-    done
-}
-
 # Execute cleanup
 echo "Cleaning system directories..."
 for dir in "${SYSTEM_DIRECTORIES[@]}"; do
-    if [[ -d "${dir}" ]]; then
-        sudo find "${dir}" -mindepth 1 -delete 2>/dev/null || true
-        echo "Cleaned: ${dir}"
-    fi
+    clean_dir sudo "${dir}"
 done
 
 echo "Cleaning user directories..."
-clean_directories "${USER_DIRECTORIES[@]}"
+for dir in "${USER_DIRECTORIES[@]}"; do
+    clean_dir "" "${dir}"
+done
 
 # === HISTORY CLEANUP ===
 echo "Clearing shell and REPL history..."
-cat /dev/null >"${HOME}/.bash_history"
-rm -f "${HOME}/.lesshst" "${HOME}/.python_history" "${HOME}/.node_repl_history"
+if [[ "${DRY_RUN}" == true ]]; then
+    echo "Would clear: ~/.bash_history ~/.lesshst ~/.python_history ~/.node_repl_history"
+else
+    cat /dev/null >"${HOME}/.bash_history"
+    rm -f "${HOME}/.lesshst" "${HOME}/.python_history" "${HOME}/.node_repl_history"
+fi
 
-echo "System cleanup complete!"
+if [[ "${DRY_RUN}" == true ]]; then
+    echo "Dry run complete. No changes made."
+else
+    echo "System cleanup complete!"
+fi
