@@ -68,7 +68,7 @@ claude_args=(
 
 err=$(mktemp 2>/dev/null || echo /dev/null) # capture stderr so a failure is logged, not swallowed
 trap '[ "$err" != /dev/null ] && rm -f "$err"' EXIT
-msg=$(printf '%s' "$diff" | timeout 20 claude "${claude_args[@]}" 2>"$err")
+msg=$(printf '%s' "$diff" | claude "${claude_args[@]}" 2>"$err")
 status=$?
 if [ "$status" -ne 0 ]; then # 124 = timeout; others are claude/auth/network errors
     log "claude failed (exit $status): $(tr '\n' ' ' <"$err" 2>/dev/null | cut -c1-500)"
