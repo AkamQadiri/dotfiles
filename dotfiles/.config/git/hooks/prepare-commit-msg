@@ -38,11 +38,29 @@ command -v claude >/dev/null 2>&1 || {
     exit 0
 }
 
-diff=$(git diff --cached --function-context) # whole enclosing function, so in-function edits read clearly
+exclude_globs=(
+    ':(exclude)*-lock.json' # npm
+    ':(exclude)*.lock.json' # nuget (packages.lock.json)
+    ':(exclude)*-lock.yaml' # pnpm
+    ':(exclude)*.lock'      # yarn, cargo, poetry, composer, gem, ...
+    ':(exclude)go.sum'
+    ':(exclude)*.min.js' ':(exclude)*.min.css' ':(exclude)*.map' # build output
+)
+
+diff=$(git diff --cached --function-context -- . "${exclude_globs[@]}")
 [ -z "$diff" ] && {
-    log "skip: empty staged diff"
+    log "skip: empty staged diff (after exclusions)"
     exit 0
 }
+
+# A large refactor can still overflow the window without any lock files. Past a
+# size budget (rough proxy for tokens) fall back to a --stat summary: always
+# small, still enough to write a subject.
+diff_budget=$((64 * 1024))
+if [ "${#diff}" -gt "$diff_budget" ]; then
+    log "diff too large (${#diff} > $diff_budget); using --stat summary"
+    diff=$(git diff --cached --stat -- . "${exclude_globs[@]}")
+fi
 
 recent=$(git log -n 20 --pretty=format:'%s' 2>/dev/null) # style examples for the prompt
 
@@ -71,7 +89,8 @@ trap '[ "$err" != /dev/null ] && rm -f "$err"' EXIT
 msg=$(printf '%s' "$diff" | claude "${claude_args[@]}" 2>"$err")
 status=$?
 if [ "$status" -ne 0 ]; then # 124 = timeout; others are claude/auth/network errors
-    log "claude failed (exit $status): $(tr '\n' ' ' <"$err" 2>/dev/null | cut -c1-500)"
+    detail=$(printf '%s %s' "$msg" "$(cat "$err" 2>/dev/null)" | tr '\n' ' ' | cut -c1-500)
+    log "claude failed (exit $status): $detail"
     exit 0
 fi
 
