@@ -1,3 +1,26 @@
+--- Lock files and minified/build output carry a formatter-backed filetype
+--- (json, yaml, css, js) but are machine-generated and must never be reflowed.
+--- Patterns mirror the exclude globs in git/hooks/prepare-commit-msg.
+local ignore_patterns = {
+	"%-lock%.json$", -- package-lock.json (npm)
+	"%.lock%.json$", -- packages.lock.json (nuget)
+	"%-lock%.yaml$", -- pnpm-lock.yaml
+	"%.lock$", -- yarn, cargo, poetry, composer, gem, ...
+	"go%.sum$",
+	"%.min%.js$",
+	"%.min%.css$",
+	"%.map$", -- source maps / build output
+}
+
+local function should_ignore(path)
+	for _, pat in ipairs(ignore_patterns) do
+		if path:match(pat) then
+			return true
+		end
+	end
+	return false
+end
+
 --- Format every project file that has a configured formatter.
 --- Scope: git-tracked plus untracked-but-not-ignored files, falling back to a
 --- recursive scan of the cwd outside a git repo. Only filetypes listed in
@@ -19,7 +42,7 @@ local function format_project()
 	local ok, err = pcall(function()
 		for _, path in ipairs(files) do
 			local ft = vim.filetype.match({ filename = path })
-			if ft and conform.formatters_by_ft[ft] and vim.fn.filereadable(path) == 1 then
+			if ft and conform.formatters_by_ft[ft] and not should_ignore(path) and vim.fn.filereadable(path) == 1 then
 				checked = checked + 1
 				local bufnr = vim.fn.bufadd(path)
 				local was_loaded = vim.api.nvim_buf_is_loaded(bufnr)
@@ -107,9 +130,14 @@ return {
 				sql = { "sqlfluff" }, -- needs a dialect in .sqlfluff
 			},
 			default_format_opts = { lsp_format = "fallback" },
-			format_on_save = {
-				timeout_ms = 500,
-			},
+			format_on_save = function(bufnr)
+				-- Skip the same lock/minified files the project formatter ignores,
+				-- so saving e.g. package-lock.json never reflows it.
+				if should_ignore(vim.api.nvim_buf_get_name(bufnr)) then
+					return
+				end
+				return { timeout_ms = 500 }
+			end,
 		})
 
 		vim.api.nvim_create_user_command("FormatProject", format_project, {
