@@ -57,7 +57,7 @@ while IFS= read -r mount_point; do
     [[ -z "${mount_point}" ]] && continue
     sudo mkdir -p "${mount_point}"
     sudo chown "${CURRENT_USER}:${CURRENT_USER}" "${mount_point}"
-done < <(awk '$1 !~ /^#/ && $2 != "/" && $2 != "" {print $2}' /etc/fstab)
+done < <(awk '$1 !~ /^#/ && $2 != "/" && $2 != "" && $3 != "swap" {print $2}' /etc/fstab)
 
 # === EXECUTABLE PERMISSIONS ===
 echo "Setting executable permissions..."
