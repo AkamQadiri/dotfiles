@@ -37,6 +37,26 @@ else
     battery_icon=""
 fi
 
+# === LOW BATTERY NOTIFICATION ===
+# Notify once per level while discharging, reset when charging
+notify_state="${XDG_RUNTIME_DIR:-/tmp}/battery-notify"
+if [ "$battery_status" = "Discharging" ]; then
+    if [ "$battery" -le "5" ]; then
+        notify_level="critical"
+    elif [ "$battery" -lt "15" ]; then
+        notify_level="normal"
+    else
+        notify_level=""
+    fi
+
+    if [ -n "$notify_level" ] && [ "$(cat "$notify_state" 2>/dev/null)" != "$notify_level" ]; then
+        notify-send -a "battery" -u "$notify_level" "Battery low" "$battery% remaining, plug in the charger"
+        echo "$notify_level" >"$notify_state"
+    fi
+else
+    rm -f "$notify_state"
+fi
+
 # === OUTPUT STATUS ===
 echo "$battery_icon $battery%"
 
