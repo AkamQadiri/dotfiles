@@ -59,6 +59,7 @@ unclutter &
 lxpolkit &
 dunst &
 xss-lock --transfer-sleep-lock -- i3lock --nofork --color 282A36 &
+udiskie &
 
 # Desktop setup
 random-wallpaper
