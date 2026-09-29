@@ -29,7 +29,7 @@ USB drives are automounted by udiskie under `/run/media/$USER/`, with a notifica
 ## Layout
 
 - `dotfiles/` — files that map into `$HOME` (configs, scripts, X startup)
-- `system/` — files that map into `/` (X11 mouse/touchpad/keyboard config, `fstab` with the swapfile, logind lid switch, udev rules)
+- `system/` — files that map into `/` (X11 mouse/touchpad/keyboard config, `fstab` with the swapfile, logind lid switch, TLP Bluetooth exclusion, udev rules)
 - `install.sh` — copies both trees into place and runs first-time setup
 
 `~/.local/bin` holds a few helper scripts: `backup-github`, `clean-system`, `pack-project`, `pve` (Proxmox VM control), and `random-wallpaper`.
