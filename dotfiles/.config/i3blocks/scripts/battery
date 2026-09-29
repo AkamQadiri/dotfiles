@@ -1,0 +1,45 @@
+#!/bin/sh
+
+# Laptop battery indicator
+# Shows charge level and charging status, hidden when no battery is present
+
+# === HANDLE MOUSE CLICKS ===
+# Button 2: Edit this script
+case $BLOCK_BUTTON in
+2) "$TERMINAL" -e "$EDITOR" "$0" ;;
+esac
+
+# === GET BATTERY STATUS ===
+# Use the first battery found
+for battery_path in /sys/class/power_supply/BAT*; do
+    break
+done
+
+# Exit if no battery is present
+[ -d "$battery_path" ] || exit 0
+
+battery=$(cat "$battery_path/capacity")
+battery_status=$(cat "$battery_path/status")
+
+# === DETERMINE ICON ===
+# Select appropriate battery icon based on status
+if [ "$battery_status" = "Charging" ]; then
+    battery_icon=""
+elif [ "$battery" -ge "90" ]; then
+    battery_icon=""
+elif [ "$battery" -ge "65" ]; then
+    battery_icon=""
+elif [ "$battery" -ge "40" ]; then
+    battery_icon=""
+elif [ "$battery" -ge "15" ]; then
+    battery_icon=""
+else
+    battery_icon=""
+fi
+
+# === OUTPUT STATUS ===
+echo "$battery_icon $battery%"
+
+# Mark block urgent when low and discharging
+[ "$battery_status" = "Discharging" ] && [ "$battery" -lt "15" ] && exit 33
+exit 0
