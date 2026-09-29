@@ -12,6 +12,7 @@ Personal configuration for an Arch Linux desktop built around i3, themed with Dr
 | Compositor     | picom                                    |
 | Notifications  | dunst                                    |
 | Launcher       | rofi                                     |
+| Screen locker  | i3lock via xss-lock                      |
 | Terminal       | Ghostty                                  |
 | Shell          | Bash                                     |
 | Editor         | Neovim (lazy.nvim)                       |
@@ -20,10 +21,12 @@ Personal configuration for an Arch Linux desktop built around i3, themed with Dr
 
 Keyboard layout is Norwegian (`no`); the display setup assumes two monitors (DP-2 at 2560×1440, DP-0 at 1920×1080).
 
+On a laptop (detected by a battery under `/sys/class/power_supply`), `.xinitrc` applies a saved `autorandr` profile instead and blanks and locks the screen after 10 minutes idle. The i3blocks battery block and the brightness keys only do anything on a laptop. The touchpad gets tap-to-click, natural scrolling and a flat acceleration profile, like the mouse.
+
 ## Layout
 
 - `dotfiles/` — files that map into `$HOME` (configs, scripts, X startup)
-- `system/` — files that map into `/` (X11 input config, `fstab`, udev rules)
+- `system/` — files that map into `/` (X11 mouse/touchpad/keyboard config, `fstab` with the swapfile, udev rules)
 - `install.sh` — copies both trees into place and runs first-time setup
 
 `~/.local/bin` holds a few helper scripts: `backup-github`, `clean-system`, `pack-project`, `pve` (Proxmox VM control), and `random-wallpaper`.
