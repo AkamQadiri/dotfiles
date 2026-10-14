@@ -70,8 +70,10 @@ export PATH="${PATH}:${ANDROID_HOME}/platform-tools"
 export PATH="${PATH}:${HOME}/.yarn/bin"
 export PATH="${PATH}:${HOME}/.npm/bin"
 
-# .NET tools
-export PATH="${PATH}:${HOME}/.dotnet/tools"
+# .NET SDK and tools
+export DOTNET_ROOT="${HOME}/.dotnet"
+export PATH="${PATH}:${DOTNET_ROOT}"
+export PATH="${PATH}:${DOTNET_ROOT}/tools"
 
 # === GIT REPOSITORY MANAGEMENT ===
 # Clone GitHub repository with fuzzy search and preview
