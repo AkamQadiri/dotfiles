@@ -29,13 +29,6 @@ set_permissions "${SYSTEM_DIR}"
 echo "Installing user dotfiles..."
 cp -a "${DOTFILES_DIR}/." "${HOME}/"
 
-# === FILESYSTEM CONFIGURATION ===
-echo "Configuring filesystem..."
-DRIVE_UUID=$(findmnt -no UUID /)
-
-# Update fstab with actual UUID
-sudo sed -i "s/\$DRIVE_UUID/${DRIVE_UUID}/g" "${SYSTEM_DIR}/etc/fstab"
-
 # === SYSTEM FILES INSTALLATION ===
 echo "Installing system configuration files..."
 
@@ -50,14 +43,6 @@ sudo cp -a "${SYSTEM_DIR}/." /
 
 # Restore user ownership of source files
 sudo chown "${CURRENT_USER}:${CURRENT_USER}" -R "${SYSTEM_DIR}/"
-
-# === MOUNT POINT CONFIGURATION ===
-echo "Creating mount points..."
-while IFS= read -r mount_point; do
-    [[ -z "${mount_point}" ]] && continue
-    sudo mkdir -p "${mount_point}"
-    sudo chown "${CURRENT_USER}:${CURRENT_USER}" "${mount_point}"
-done < <(awk '$1 !~ /^#/ && $2 != "/" && $2 != "" && $3 != "swap" {print $2}' /etc/fstab)
 
 # === EXECUTABLE PERMISSIONS ===
 echo "Setting executable permissions..."

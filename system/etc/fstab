@@ -1,8 +1,0 @@
-# File System Table
-# <file system>    <mount point>    <type>    <options>                    <dump>    <pass>
-
-# Root filesystem
-UUID=$DRIVE_UUID    /                ext4      rw,relatime                 0         1
-
-# Swapfile (created by archinstall, used for hibernation)
-/swapfile           none             swap      defaults                    0         0
