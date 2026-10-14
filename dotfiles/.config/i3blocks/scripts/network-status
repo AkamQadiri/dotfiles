@@ -6,13 +6,10 @@
 # === HELPER FUNCTIONS ===
 # Toggle wireless radio frequency blocking
 toggle_rf() {
-    local rf_status
-    rf_status=$(rfkill -ro Soft list wlan | grep "blocked")
-
-    if [[ "${rf_status}" == "unblocked" ]]; then
-        rfkill block wlan
-    else
+    if rfkill -nro SOFT list wlan | grep -qx "blocked"; then
         rfkill unblock wlan
+    else
+        rfkill block wlan
     fi
 }
 
