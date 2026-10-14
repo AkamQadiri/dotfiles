@@ -79,20 +79,29 @@ export PATH="${PATH}:${DOTNET_ROOT}/tools"
 # Clone GitHub repository with fuzzy search and preview
 clone-github() {
     local repo owner owners
+    # shellcheck disable=SC2016  # GraphQL variables, not shell
+    local query='query($owner: String!, $endCursor: String) {
+        repositoryOwner(login: $owner) {
+            repositories(first: 100, after: $endCursor, ownerAffiliations: OWNER, orderBy: {field: PUSHED_AT, direction: DESC}) {
+                pageInfo { hasNextPage endCursor }
+                nodes { nameWithOwner description updatedAt }
+            }
+        }
+    }'
     mapfile -t owners < <(
         gh api graphql -f query='{ viewer { login organizations(first: 100) { nodes { login } } } }' \
             --jq '.data.viewer | .login, .organizations.nodes[].login'
     )
 
+    # Stream each page into fzf as it arrives, padding names so the columns line up
     repo=$(
         {
-            echo "NAME|DESCRIPTION|UPDATED"
+            printf '%-52s%-12s%s\n' NAME UPDATED DESCRIPTION
             for owner in "${owners[@]}"; do
-                gh repo list "${owner}" --limit 1000 --json nameWithOwner,description,updatedAt |
-                    jq -r '.[] | "\(.nameWithOwner)|\(.description)|\(.updatedAt | strptime("%Y-%m-%dT%H:%M:%SZ") | strftime("%d.%m.%Y"))"'
+                gh api graphql --paginate -F owner="${owner}" -f query="${query}" \
+                    --jq '.data.repositoryOwner.repositories.nodes[] | "\(.nameWithOwner | . + " " * ([52 - length, 2] | max))\(.updatedAt | strptime("%Y-%m-%dT%H:%M:%SZ") | strftime("%d.%m.%Y"))  \(.description)"'
             done
-        } | column -t -s '|' |
-            fzf --header-lines=1 --layout=reverse --preview 'gh repo view {1}' --preview-window=bottom |
+        } | fzf --header-lines=1 --layout=reverse --preview 'gh repo view {1}' --preview-window=bottom |
             awk '{print $1}'
     )
 
