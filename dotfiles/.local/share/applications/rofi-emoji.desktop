@@ -1,9 +1,9 @@
 [Desktop Entry]
+Type=Application
 Name=Rofi Emoji
 GenericName=Emoji Picker
 Comment=Browse and select emoji through Rofi interface
-Exec=rofi -show emoji -modi emoji
 Icon=accessories-character-map
+Exec=rofi -show emoji -modi emoji
 Terminal=false
-Type=Application
 Categories=Utility;
