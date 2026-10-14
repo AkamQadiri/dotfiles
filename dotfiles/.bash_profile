@@ -8,6 +8,7 @@ export XDG_CACHE_HOME="${HOME}/.cache"
 export XDG_STATE_HOME="${HOME}/.local/state"
 
 # === SOURCE BASHRC ===
+# shellcheck disable=SC1090
 [[ -f ~/.bashrc ]] && . ~/.bashrc
 
 # === X11 STARTUP ===

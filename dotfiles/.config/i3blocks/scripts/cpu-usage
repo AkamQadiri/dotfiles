@@ -11,7 +11,7 @@ esac
 
 # === GET CPU USAGE ===
 # Read CPU stats and calculate usage over a small interval
-read -r cpu user nice system idle iowait irq softirq steal guest guest_nice </proc/stat
+read -r _ user nice system idle iowait irq softirq steal _ </proc/stat
 
 # Calculate total and idle from first sample
 prevtotal=$((user + nice + system + idle + iowait + irq + softirq + steal))
@@ -21,7 +21,7 @@ previdle=$idle
 sleep 0.1
 
 # Read CPU stats again
-read -r cpu user nice system idle iowait irq softirq steal guest guest_nice </proc/stat
+read -r _ user nice system idle iowait irq softirq steal _ </proc/stat
 
 # Calculate total and idle from second sample
 total=$((user + nice + system + idle + iowait + irq + softirq + steal))
