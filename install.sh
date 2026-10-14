@@ -59,8 +59,4 @@ if [[ -f "${HOME}/.config/user-dirs.dirs" ]]; then
     done
 fi
 
-# === SYSTEM UPDATE ===
-echo "Regenerating initramfs..."
-sudo mkinitcpio -P
-
 echo "Installation complete!"
