@@ -25,6 +25,11 @@ adapter_status() {
             | @tsv'
 }
 
+# Wrap text in Pango markup that dims it
+dim() {
+    echo "<span foreground='#6272A4'>$1</span>"
+}
+
 # Toggle Bluetooth radio frequency blocking
 toggle_bluetooth() {
     if [[ "${powered}" == "true" ]]; then
@@ -59,7 +64,5 @@ if [[ "${powered}" == "true" ]]; then
         echo ""
     fi
 else
-    echo ""
-    echo ""
-    echo "#6272A4"
+    dim ""
 fi
