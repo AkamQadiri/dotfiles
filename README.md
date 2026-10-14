@@ -29,7 +29,7 @@ On a laptop, closing the lid suspends, then hibernates before the battery runs o
 
 USB drives are automounted by udiskie under `/run/media/$USER/`, with a notification on mount and unmount.
 
-When a Bluetooth adapter is present, an i3blocks block shows whether Bluetooth is on and how many devices are connected. Left click (or `$mod+b`) opens bluetui, right click turns Bluetooth on or off.
+When a Bluetooth adapter is present, an i3blocks block shows whether Bluetooth is on and how many devices are connected. Left click opens bluetui, right click turns Bluetooth on or off.
 
 ## Layout
 
