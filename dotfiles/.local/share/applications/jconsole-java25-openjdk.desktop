@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=OpenJDK Java 25 Console
+Comment=OpenJDK Java 25 Monitoring & Management Console
+Keywords=java;console;monitoring
+Icon=java25-openjdk
+Exec=/usr/lib/jvm/java-25-openjdk/bin/jconsole
+Terminal=false
+Categories=Application;System;
+NoDisplay=true

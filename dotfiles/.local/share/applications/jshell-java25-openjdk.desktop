@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=OpenJDK Java 25 Shell
+Comment=OpenJDK Java 25 Shell
+Keywords=java;shell
+Icon=java25-openjdk
+Exec=/usr/lib/jvm/java-25-openjdk/bin/jshell
+Terminal=true
+Categories=Application;System;
+NoDisplay=true
