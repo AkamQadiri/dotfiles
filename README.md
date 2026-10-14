@@ -45,10 +45,9 @@ When a Bluetooth adapter is present, an i3blocks block shows whether Bluetooth i
 
 > [!WARNING]
 > This is tuned to my hardware. `install.sh` copies files into system
-> directories and regenerates the initramfs with `mkinitcpio -P`. Read it
-> first and adjust the hardware-specific pieces — the `autorandr` profile for
-> your monitors, the webcam rule under `system/etc/udev/`, and the keyboard
-> layout — before running.
+> directories. Read it first and adjust the hardware-specific pieces — the
+> `autorandr` profile for your monitors, the webcam rule under
+> `system/etc/udev/`, and the keyboard layout — before running.
 
 ```sh
 git clone https://github.com/<your-username>/dotfiles.git
