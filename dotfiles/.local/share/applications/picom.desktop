@@ -1,7 +1,6 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-NoDisplay=false
 Name=Picom
 GenericName=X compositor
 Comment=An X compositor
