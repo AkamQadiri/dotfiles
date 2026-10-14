@@ -2,60 +2,68 @@
 set -euo pipefail
 
 # Proxmox VE VM control script
-# Controls VM power state via Proxmox API
+# Controls VM power state via the Proxmox API, authenticated with an API token
 
 # === CONFIGURATION ===
 HOST="${PVE_HOST:-}"
 NODE="${PVE_NODE:-pve}"
-USERNAME="${PVE_USERNAME:-script@pve}"
-PASSWORD="${PVE_PASSWORD:-}"
+TOKEN_ID="${PVE_TOKEN_ID:-script@pve!power}"
+PUBKEY_PIN="${PVE_PUBKEY_PIN:-}"
 
 # === VALIDATION ===
-if [[ -z "${HOST}" ]] || [[ -z "${PASSWORD}" ]]; then
-    echo "Error: PVE_HOST and PVE_PASSWORD environment variables must be set"
-    echo "Usage: export PVE_HOST='192.168.1.1:8006'"
-    echo "       export PVE_NODE='pve'"
-    echo "       export PVE_USERNAME='script@pve'"
-    echo "       export PVE_PASSWORD='your-password'"
+if [[ -z "${HOST}" ]]; then
+    echo "Error: PVE_HOST must be set" >&2
+    echo "Usage: export PVE_HOST='192.168.1.1:8006'" >&2
+    echo "       export PVE_NODE='pve'                  # default: pve" >&2
+    echo "       export PVE_TOKEN_ID='script@pve!power' # default: script@pve!power" >&2
+    echo "       export PVE_PUBKEY_PIN='sha256//...'    # optional, verifies the server" >&2
     exit 1
 fi
 
 COMMAND="${1:-}"
 VM_ID="${2:-}"
 
-if [[ -z "${COMMAND}" ]] || [[ -z "${VM_ID}" ]]; then
-    echo "Usage: $(basename "$0") <start|shutdown|reboot> <vm_id>"
+if [[ ! "${COMMAND}" =~ ^(start|shutdown|reboot)$ ]] || [[ ! "${VM_ID}" =~ ^[0-9]+$ ]]; then
+    echo "Usage: $(basename "$0") <start|shutdown|reboot> <vm_id>" >&2
     exit 1
 fi
 
-if [[ ! "${COMMAND}" =~ ^(start|shutdown|reboot)$ ]]; then
-    echo "Error: Invalid command '${COMMAND}'"
-    echo "Valid commands: start, shutdown, reboot"
+# === TOKEN SECRET ===
+# Kept in the keyring rather than the environment
+TOKEN_SECRET=$(secret-tool lookup service pve token "${TOKEN_ID}" 2>/dev/null || true)
+if [[ -z "${TOKEN_SECRET}" ]]; then
+    echo "Error: No secret in the keyring for API token ${TOKEN_ID}" >&2
+    echo "Store it with: secret-tool store --label='Proxmox API token' service pve token '${TOKEN_ID}'" >&2
     exit 1
 fi
 
-# === API CONFIGURATION ===
-API_BASE="https://${HOST}/api2/json"
-API_RESOURCE="nodes/${NODE}/qemu/${VM_ID}/status/${COMMAND}"
-API_TICKET_URL="${API_BASE}/access/ticket"
-
-# === AUTHENTICATION ===
-echo "Authenticating with Proxmox..."
-TICKET_DATA=$(curl -s --insecure \
-    --data "username=${USERNAME}&password=${PASSWORD}" \
-    "${API_TICKET_URL}") || {
-    echo "Error: Failed to authenticate"
-    exit 1
-}
-
-TICKET=$(jq -r '.data.ticket' <<<"${TICKET_DATA}")
-TOKEN_ID=$(jq -r '.data.CSRFPreventionToken' <<<"${TICKET_DATA}")
+# === TLS VERIFICATION ===
+# Proxmox uses a self-signed certificate. Instead of a copy of its CA,
+# PVE_PUBKEY_PIN pins the server's public key; curl checks the pin even with
+# --insecure and refuses any other server.
+TLS_ARGS=(--insecure)
+if [[ -n "${PUBKEY_PIN}" ]]; then
+    TLS_ARGS+=(--pinnedpubkey "${PUBKEY_PIN}")
+fi
 
 # === EXECUTE COMMAND ===
 echo "Sending ${COMMAND} command to VM ${VM_ID}..."
-curl -s --insecure \
-    --cookie "PVEAuthCookie=${TICKET}" \
-    --header "CSRFPreventionToken:${TOKEN_ID}" \
-    -X POST "${API_BASE}/${API_RESOURCE}" >/dev/null
 
-echo "Command sent successfully"
+# The token goes in as a header on stdin, keeping it out of the process list
+RESPONSE=$(printf 'Authorization: PVEAPIToken=%s=%s\n' "${TOKEN_ID}" "${TOKEN_SECRET}" |
+    curl --silent --show-error --fail-with-body "${TLS_ARGS[@]}" \
+        --header @- \
+        --request POST \
+        "https://${HOST}/api2/json/nodes/${NODE}/qemu/${VM_ID}/status/${COMMAND}") || {
+    echo "Error: Request failed${RESPONSE:+: ${RESPONSE}}" >&2
+    exit 1
+}
+
+# A successful request returns the ID of the Proxmox task it started
+TASK=$(jq -r '.data // empty' <<<"${RESPONSE}" 2>/dev/null || true)
+if [[ "${TASK}" != UPID:* ]]; then
+    echo "Error: Unexpected response from Proxmox: ${RESPONSE}" >&2
+    exit 1
+fi
+
+echo "Proxmox accepted the ${COMMAND} command for VM ${VM_ID}"
