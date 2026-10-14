@@ -78,12 +78,19 @@ export PATH="${PATH}:${DOTNET_ROOT}/tools"
 # === GIT REPOSITORY MANAGEMENT ===
 # Clone GitHub repository with fuzzy search and preview
 clone-github() {
-    local repo
+    local repo owner owners
+    mapfile -t owners < <(
+        gh api graphql -f query='{ viewer { login organizations(first: 100) { nodes { login } } } }' \
+            --jq '.data.viewer | .login, .organizations.nodes[].login'
+    )
+
     repo=$(
         {
             echo "NAME|DESCRIPTION|UPDATED"
-            gh repo list --json nameWithOwner,description,updatedAt |
-                jq -r '.[] | "\(.nameWithOwner)|\(.description)|\(.updatedAt | strptime("%Y-%m-%dT%H:%M:%SZ") | strftime("%d.%m.%Y"))"'
+            for owner in "${owners[@]}"; do
+                gh repo list "${owner}" --limit 1000 --json nameWithOwner,description,updatedAt |
+                    jq -r '.[] | "\(.nameWithOwner)|\(.description)|\(.updatedAt | strptime("%Y-%m-%dT%H:%M:%SZ") | strftime("%d.%m.%Y"))"'
+            done
         } | column -t -s '|' |
             fzf --header-lines=1 --layout=reverse --preview 'gh repo view {1}' --preview-window=bottom |
             awk '{print $1}'
