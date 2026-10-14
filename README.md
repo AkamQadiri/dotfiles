@@ -20,16 +20,18 @@ Personal configuration for an Arch Linux desktop built around i3, themed with Dr
 | File manager   | nnn                                      |
 | Theme          | Dracula (GTK, Qt, terminal, app configs) |
 
-Keyboard layout is Norwegian (`no`); the display setup assumes two monitors (DP-2 at 2560×1440, DP-0 at 1920×1080).
+The GTK theme and icons come from the AUR packages `dracula-gtk-theme` and `dracula-icons-git` (installed by archinstall). `~/.config/gtk-4.0` imports the theme for GTK 4 and libadwaita apps, which only read it from there.
 
-On a laptop (detected by a battery under `/sys/class/power_supply`), `.xinitrc` applies a saved `autorandr` profile instead and blanks and locks the screen after 10 minutes idle. Closing the lid suspends, then hibernates before the battery runs out. The i3blocks battery block (with notifications below 15% and at 5%) and the brightness keys only do anything on a laptop. The touchpad gets tap-to-click, natural scrolling and a flat acceleration profile, like the mouse.
+Keyboard layout is Norwegian (`no`). Displays are set by `autorandr` at login and on monitor hotplug, from the profile saved for the connected monitors (`autorandr --save <name>`). With no matching profile, every screen gets its largest resolution at its highest refresh rate, side by side, with the largest screen as primary (`~/.config/autorandr/postswitch`). The screen blanks and locks after 10 minutes idle.
+
+On a laptop, closing the lid suspends, then hibernates before the battery runs out. The i3blocks battery block (with notifications below 15% and at 5%) and the brightness keys only do anything on a laptop. The touchpad gets tap-to-click, natural scrolling and a flat acceleration profile, like the mouse.
 
 USB drives are automounted by udiskie under `/run/media/$USER/`, with a notification on mount and unmount.
 
 ## Layout
 
 - `dotfiles/` — files that map into `$HOME` (configs, scripts, X startup)
-- `system/` — files that map into `/` (X11 mouse/touchpad/keyboard config, `fstab` with the swapfile, logind lid switch, TLP Bluetooth exclusion, udev rules)
+- `system/` — files that map into `/` (X11 mouse/touchpad/keyboard config, logind lid switch, TLP Bluetooth exclusion, udev rules)
 - `install.sh` — copies both trees into place and runs first-time setup
 
 `~/.local/bin` holds a few helper scripts: `backup-github`, `clean-system`, `pack-project`, `pve` (Proxmox VM control), and `random-wallpaper`.
@@ -38,11 +40,10 @@ USB drives are automounted by udiskie under `/run/media/$USER/`, with a notifica
 
 > [!WARNING]
 > This is tuned to my hardware. `install.sh` copies files into system
-> directories, rewrites the root UUID in `/etc/fstab`, creates mount points
-> for any extra `fstab` entries, and regenerates the initramfs with
-> `mkinitcpio -P`. Read it first and adjust the hardware-specific pieces — the
-> monitor layout in `.xinitrc`, the webcam rule under `system/etc/udev/`, and
-> the keyboard layout — before running.
+> directories and regenerates the initramfs with `mkinitcpio -P`. Read it
+> first and adjust the hardware-specific pieces — the `autorandr` profile for
+> your monitors, the webcam rule under `system/etc/udev/`, and the keyboard
+> layout — before running.
 
 ```sh
 git clone https://github.com/<your-username>/dotfiles.git
