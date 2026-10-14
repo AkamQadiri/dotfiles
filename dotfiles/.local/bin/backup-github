@@ -5,28 +5,16 @@ set -euo pipefail
 # Clones all user repositories and archives them
 
 # === GITHUB CONFIGURATION ===
-GITHUB_USER=$(git config user.name || echo "")
-if [[ -z "${GITHUB_USER}" ]]; then
-    echo "Error: Git user.name not configured"
+# Uses the active gh account; gh supplies the credentials to git, so no token
+# is ever written into a URL, the process list, or the cloned repositories.
+GITHUB_USER=$(gh api user --jq .login 2>/dev/null) || {
+    echo "Error: gh is not logged in (run 'gh auth login')"
     exit 1
-fi
-
-# Get credentials from git credential helper
-GITHUB_CREDENTIALS=$(git credential fill <<<"url=https://github.com" || true)
-GITHUB_USERNAME=$(grep 'username' <<<"${GITHUB_CREDENTIALS}" | cut -d '=' -f2)
-GITHUB_PASSWORD=$(grep 'password' <<<"${GITHUB_CREDENTIALS}" | cut -d '=' -f2)
-
-if [[ -z "${GITHUB_USERNAME}" ]] || [[ -z "${GITHUB_PASSWORD}" ]]; then
-    echo "Error: GitHub credentials not found"
-    exit 1
-fi
+}
 
 # === FETCH REPOSITORIES ===
-echo "Fetching repository list..."
-GITHUB_REPOS=$(curl -s -L \
-    -H "Accept: application/vnd.github+json" \
-    "https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@api.github.com/user/repos" |
-    jq -r '.[].full_name') || {
+echo "Fetching repository list for ${GITHUB_USER}..."
+GITHUB_REPOS=$(gh api --paginate /user/repos --jq '.[].full_name') || {
     echo "Error: Failed to fetch repository list"
     exit 1
 }
@@ -44,7 +32,7 @@ SHOULD_UNMOUNT=false
 
 if [[ -z "${BACKUP_MOUNTPOINT}" ]]; then
     echo "Mounting backup drive..."
-    mount "${BACKUP_DRIVE}" || {
+    udisksctl mount -b "${BACKUP_DRIVE}" >/dev/null || {
         echo "Error: Failed to mount ${BACKUP_DRIVE}"
         exit 1
     }
@@ -56,13 +44,14 @@ BACKUP_DESTINATION="${BACKUP_MOUNTPOINT}/${BACKUP_PATH}"
 
 # === CLONE REPOSITORIES ===
 echo "Creating temporary directory..."
+rm -rf "${REPOS_DIR}"
 mkdir -p "${REPOS_DIR}"
 
 echo "Cloning repositories..."
 while IFS= read -r repo; do
     echo "Cloning ${repo}..."
-    git -C "${REPOS_DIR}" clone \
-        "https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/${repo}" || {
+    # Bare: every branch and tag, without the working tree
+    gh repo clone "${repo}" "${REPOS_DIR}/${repo}.git" --no-upstream -- --bare --quiet || {
         echo "Warning: Failed to clone ${repo}"
     }
 done <<<"${GITHUB_REPOS}"
@@ -83,7 +72,7 @@ rm -rf "${REPOS_DIR}"
 
 if [[ "${SHOULD_UNMOUNT}" == "true" ]]; then
     echo "Unmounting backup drive..."
-    umount "${BACKUP_DRIVE}"
+    udisksctl unmount -b "${BACKUP_DRIVE}" >/dev/null
 fi
 
 echo "Backup complete: ${BACKUP_DESTINATION}/${ARCHIVE_NAME}"
