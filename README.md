@@ -14,6 +14,7 @@ Personal configuration for an Arch Linux desktop built around i3, themed with Dr
 | Launcher       | rofi                                     |
 | Screen locker  | i3lock via xss-lock                      |
 | Automount      | udiskie                                  |
+| Bluetooth      | bluetui                                  |
 | Terminal       | Ghostty                                  |
 | Shell          | Bash                                     |
 | Editor         | Neovim (lazy.nvim)                       |
@@ -27,6 +28,8 @@ Keyboard layout is Norwegian (`no`). Displays are set by `autorandr` at login an
 On a laptop, closing the lid suspends, then hibernates before the battery runs out. The i3blocks battery block (with notifications below 15% and at 5%) and the brightness keys only do anything on a laptop. The touchpad gets tap-to-click, natural scrolling and a flat acceleration profile, like the mouse.
 
 USB drives are automounted by udiskie under `/run/media/$USER/`, with a notification on mount and unmount.
+
+When a Bluetooth adapter is present, an i3blocks block shows whether Bluetooth is on and how many devices are connected. Left click (or `$mod+b`) opens bluetui, right click turns Bluetooth on or off.
 
 ## Layout
 
