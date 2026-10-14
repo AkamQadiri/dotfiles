@@ -1,0 +1,55 @@
+#!/bin/bash
+
+# autorandr postswitch hook
+# Runs after every profile switch, at login and on monitor hotplug
+
+# === BEST MODES FOR UNKNOWN SETUPS ===
+# No saved profile matched, so autorandr fell back to the "horizontal" virtual
+# profile, which uses each screen's preferred mode (often 60 Hz). Switch every
+# connected screen to its largest resolution at that resolution's highest
+# refresh rate, left to right, with the largest screen as primary. Saved
+# profiles are left exactly as saved.
+if [[ "${AUTORANDR_CURRENT_PROFILE:-}" == "horizontal" ]]; then
+    # One line per connected output: name mode rate width area
+    mapfile -t screens < <(xrandr --query | awk '
+        function flush() { if (output != "" && mode != "") print output, mode, rate, width, area }
+        /^[^ ]/ {
+            flush()
+            output = ($2 == "connected") ? $1 : ""
+            mode = ""; rate = 0; width = 0; area = 0
+            next
+        }
+        # Mode lines; interlaced modes (e.g. 1920x1080i) do not match
+        output != "" && $1 ~ /^[0-9]+x[0-9]+$/ {
+            split($1, size, "x")
+            for (i = 2; i <= NF; i++) {
+                r = $i
+                gsub(/[*+]/, "", r)
+                if (r == "") continue
+                a = size[1] * size[2]
+                if (a > area || (a == area && r + 0 > rate + 0)) {
+                    mode = $1; rate = r; width = size[1]; area = a
+                }
+            }
+        }
+        END { flush() }')
+
+    if ((${#screens[@]} > 0)); then
+        primary=$(printf '%s\n' "${screens[@]}" | sort -k5,5n | tail -n 1 | cut -d ' ' -f 1)
+        args=()
+        x=0
+        for screen in "${screens[@]}"; do
+            read -r name mode rate width _ <<<"${screen}"
+            args+=(--output "${name}" --mode "${mode}" --rate "${rate}" --pos "${x}x0")
+            [[ "${name}" == "${primary}" ]] && args+=(--primary)
+            x=$((x + width))
+        done
+        xrandr "${args[@]}"
+    fi
+fi
+
+# === WALLPAPER ===
+# Redraw the current wallpaper across the new screen layout
+[[ -x "${HOME}/.fehbg" ]] && "${HOME}/.fehbg"
+
+exit 0
