@@ -17,32 +17,23 @@ SYSTEM_DIR="${PWD}/system"
 # === FUNCTIONS ===
 set_permissions() {
     local path="$1"
-    find "${path}" -type d -exec sudo chmod 755 {} \;
-    find "${path}" -type f -exec sudo chmod 644 {} \;
+    find "${path}" -type d -exec chmod 755 {} \;
+    find "${path}" -type f -exec chmod 644 {} \;
 }
-
-# === SYSTEM FILE PERMISSIONS ===
-echo "Setting system file permissions..."
-set_permissions "${SYSTEM_DIR}"
 
 # === USER CONFIGURATION ===
 echo "Installing user dotfiles..."
 cp -a "${DOTFILES_DIR}/." "${HOME}/"
 
 # === SYSTEM FILES INSTALLATION ===
+# Install from a root-owned copy so the repository is never modified
 echo "Installing system configuration files..."
-
-# Store current user for permission restoration
-CURRENT_USER=$(whoami)
-
-# Set root ownership for system files
-sudo chown root:root -R "${SYSTEM_DIR}/"
-
-# Install system configuration files (preserves ownership)
-sudo cp -a "${SYSTEM_DIR}/." /
-
-# Restore user ownership of source files
-sudo chown "${CURRENT_USER}:${CURRENT_USER}" -R "${SYSTEM_DIR}/"
+STAGING_DIR=$(mktemp -d)
+cp -a "${SYSTEM_DIR}/." "${STAGING_DIR}/"
+set_permissions "${STAGING_DIR}"
+sudo chown root:root -R "${STAGING_DIR}"
+sudo cp -a "${STAGING_DIR}/." /
+sudo rm -rf "${STAGING_DIR}"
 
 # === EXECUTABLE PERMISSIONS ===
 echo "Setting executable permissions..."
