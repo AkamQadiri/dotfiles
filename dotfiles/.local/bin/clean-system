@@ -98,7 +98,6 @@ run sudo journalctl --vacuum-time=1s
 # === DIRECTORY CLEANUP ===
 SYSTEM_DIRECTORIES=(
     "/var/lib/systemd/coredump"
-    "/var/log/journal"
     "/var/log/libvirt"
     "/var/tmp"
     "/var/cache/fontconfig"
