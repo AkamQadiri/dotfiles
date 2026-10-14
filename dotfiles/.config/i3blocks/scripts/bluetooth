@@ -44,7 +44,12 @@ esac
 # === OUTPUT STATUS ===
 # Dimmed icon when off, connected device count when any are connected
 if bluetooth_on; then
-    connected=$(timeout 3 bluetoothctl devices Connected | grep -c "^Device")
+    # Each connected device has a hciN:handle entry next to the adapter
+    connected=0
+    for connection in "${adapter_path}":*; do
+        [[ -e "${connection}" ]] && connected=$((connected + 1))
+    done
+
     if [[ "${connected}" -gt 0 ]]; then
         echo " ${connected}"
     else
