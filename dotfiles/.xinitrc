@@ -42,13 +42,8 @@ fi
 autorandr --change --default horizontal
 
 # === SCREEN BLANKING ===
-if ls /sys/class/power_supply/BAT* >/dev/null 2>&1; then
-    # Laptop: blank and lock after 10 minutes idle
-    xset s 600
-else
-    # Desktop: disable screen blanking
-    xset s off -dpms
-fi
+# Blank and lock (via xss-lock) after 10 minutes idle
+xset s 600
 
 # === STARTUP APPLICATIONS ===
 # Background services
