@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# Bluetooth status indicator
+# Shows Bluetooth state and connected device count, hidden when no adapter is present
+
+# === GET ADAPTER ===
+# Use the first adapter found
+for adapter_path in /sys/class/bluetooth/hci*; do
+    break
+done
+
+# Exit if no adapter is present
+[[ -e "${adapter_path}" ]] || exit 0
+adapter="${adapter_path##*/}"
+
+# === HELPER FUNCTIONS ===
+# Check that Bluetooth is not blocked and the adapter is powered
+bluetooth_on() {
+    ! rfkill -nro SOFT list bluetooth | grep -qx "blocked" &&
+        busctl get-property org.bluez "/org/bluez/${adapter}" org.bluez.Adapter1 Powered 2>/dev/null |
+        grep -qx "b true"
+}
+
+# Toggle Bluetooth radio frequency blocking
+toggle_bluetooth() {
+    if bluetooth_on; then
+        rfkill block bluetooth
+    else
+        rfkill unblock bluetooth
+        timeout 3 bluetoothctl power on >/dev/null
+    fi
+}
+
+# === HANDLE MOUSE CLICKS ===
+# Button 1: Open Bluetooth manager
+# Button 2: Edit this script
+# Button 3: Toggle Bluetooth on/off
+case ${BLOCK_BUTTON} in
+1) "${TERMINAL}" -e "bluetui" ;;
+2) "${TERMINAL}" -e "${EDITOR}" "$0" ;;
+3) toggle_bluetooth ;;
+esac
+
+# === OUTPUT STATUS ===
+# Dimmed icon when off, connected device count when any are connected
+if bluetooth_on; then
+    connected=$(timeout 3 bluetoothctl devices Connected | grep -c "^Device")
+    if [[ "${connected}" -gt 0 ]]; then
+        echo " ${connected}"
+    else
+        echo ""
+    fi
+else
+    echo ""
+    echo ""
+    echo "#6272A4"
+fi
