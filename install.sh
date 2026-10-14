@@ -35,10 +35,6 @@ sudo chown root:root -R "${STAGING_DIR}"
 sudo cp -a "${STAGING_DIR}/." /
 sudo rm -rf "${STAGING_DIR}"
 
-# === EXECUTABLE PERMISSIONS ===
-echo "Setting executable permissions..."
-find "${HOME}/.local/bin" -type f -exec chmod u+x {} \; 2>/dev/null || true
-
 # === XDG USER DIRECTORIES ===
 echo "Creating XDG user directories..."
 if [[ -f "${HOME}/.config/user-dirs.dirs" ]]; then
