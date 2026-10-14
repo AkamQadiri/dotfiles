@@ -21,7 +21,8 @@ GITHUB_REPOS=$(gh api --paginate /user/repos --jq '.[].full_name') || {
 
 # === BACKUP CONFIGURATION ===
 REPOS_DIR="/tmp/${GITHUB_USER}-repos"
-BACKUP_DATE=$(date +"%Y-%m-%dT%H:%M:%S%:z")
+# No colons, so the archive can be written to FAT, exFAT and NTFS drives
+BACKUP_DATE=$(date +"%Y-%m-%dT%H%M%S%z")
 ARCHIVE_NAME="${GITHUB_USER}-repos-${BACKUP_DATE}.tar.gz"
 BACKUP_DRIVE="/dev/sdb"
 BACKUP_PATH="backup/github"
