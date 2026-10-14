@@ -29,6 +29,8 @@ On a laptop, closing the lid suspends, then hibernates before the battery runs o
 
 USB drives are automounted by udiskie under `/run/media/$USER/`, with a notification on mount and unmount.
 
+The network block shows an Ethernet icon while a cable is connected, the WiFi icon with signal strength while connected (plain when WiFi is on but not connected, dimmed when it is off), and a lock icon while a VPN is up. While a cable is connected it carries the traffic, so the WiFi icon is dimmed when WiFi is on and hidden when it is off. Left click opens nmtui, right click turns WiFi on or off.
+
 When a Bluetooth adapter is present, an i3blocks block shows whether Bluetooth is on and how many devices are connected. Left click opens bluetui, right click turns Bluetooth on or off.
 
 ## Layout
