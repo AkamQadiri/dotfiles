@@ -17,6 +17,7 @@ interval=3
 [network-status]
 interval=3
 signal=3
+markup=pango
 
 [bluetooth]
 interval=3

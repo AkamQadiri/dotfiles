@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Network status indicator
-# Shows WiFi strength, Ethernet status, and VPN connections
+# Shows Ethernet and WiFi connections, WiFi signal strength, and VPN connections
 
 # === HELPER FUNCTIONS ===
 # Toggle wireless radio frequency blocking
@@ -11,6 +11,11 @@ toggle_rf() {
     else
         rfkill block wlan
     fi
+}
+
+# Wrap text in Pango markup that dims it
+dim() {
+    echo "<span foreground='#6272A4'>$1</span>"
 }
 
 # === HANDLE MOUSE CLICKS ===
@@ -23,15 +28,66 @@ case ${BLOCK_BUTTON} in
 3) toggle_rf ;;
 esac
 
+# === INTERFACE STATUS ===
+# Physical interfaces have a device link; VPNs (tun, WireGuard) have type 65534
+wifi_interface=""
+ethernet_up=false
+vpn_up=false
+for interface_path in /sys/class/net/*; do
+    read -r operstate <"${interface_path}/operstate"
+    read -r type <"${interface_path}/type"
+
+    if [[ -e "${interface_path}/device" ]]; then
+        if [[ -d "${interface_path}/wireless" ]]; then
+            [[ -z "${wifi_interface}" ]] && wifi_interface="${interface_path##*/}"
+        elif [[ "${operstate}" == "up" ]]; then
+            ethernet_up=true
+        fi
+    elif [[ "${type}" == "65534" ]] && [[ "${operstate}" != "down" ]]; then
+        vpn_up=true
+    fi
+done
+
 # === WIFI STATUS ===
-# Check if WiFi interface is up and get signal strength
-if grep -xq 'up' /sys/class/net/w*/operstate 2>/dev/null; then
-    wifiicon=$(awk '/^\s*w/ { print "", int($3 * 100 / 70) "% " }' /proc/net/wireless)
-elif grep -xq 'down' /sys/class/net/w*/operstate 2>/dev/null; then
-    # Check if WiFi is disabled
-    grep -xq '0x1003' /sys/class/net/w*/flags && wifiicon=""
+# Check if WiFi is blocked or connected and get signal strength
+wifi=""
+if [[ -n "${wifi_interface}" ]]; then
+    wifi_blocked=false
+    for rfkill_path in /sys/class/rfkill/rfkill*; do
+        read -r rfkill_type <"${rfkill_path}/type"
+        read -r soft <"${rfkill_path}/soft"
+        read -r hard <"${rfkill_path}/hard"
+        [[ "${rfkill_type}" == "wlan" ]] && [[ "${soft}${hard}" != "00" ]] && wifi_blocked=true
+    done
+
+    read -r wifi_state <"/sys/class/net/${wifi_interface}/operstate"
+    if [[ "${ethernet_up}" == true ]]; then
+        # Ethernet carries the traffic: dimmed icon if WiFi is on, hidden if off
+        [[ "${wifi_blocked}" == false ]] && wifi=$(dim "")
+    elif [[ "${wifi_blocked}" == true ]]; then
+        wifi=$(dim "")
+    elif [[ "${wifi_state}" == "up" ]]; then
+        # Convert dBm to percent on NetworkManager's scale (-100 to -40 dBm)
+        dbm=$(iw dev "${wifi_interface}" link 2>/dev/null | awk '/signal:/ { print $2 }')
+        if [[ -n "${dbm}" ]]; then
+            ((dbm < -100)) && dbm=-100
+            ((dbm > -40)) && dbm=-40
+            wifi=" $(((dbm + 100) * 100 / 60))%"
+        else
+            wifi=""
+        fi
+    else
+        wifi=""
+    fi
 fi
 
 # === OUTPUT STATUS ===
-# Combine WiFi, Ethernet, and VPN status
-echo "$wifiicon $(sed "s/down//;s/up//" /sys/class/net/e*/operstate 2>/dev/null)$(sed "s/.*//" /sys/class/net/tun*/operstate 2>/dev/null)"
+# Combine Ethernet, WiFi, and VPN status
+output=()
+[[ "${ethernet_up}" == true ]] && output+=("")
+[[ -n "${wifi}" ]] && output+=("${wifi}")
+# Dimmed Ethernet icon when there is no cable and no WiFi
+[[ "${ethernet_up}" == false ]] && [[ -z "${wifi}" ]] && output+=("$(dim "")")
+[[ "${vpn_up}" == true ]] && output+=("")
+
+echo "${output[*]}"
