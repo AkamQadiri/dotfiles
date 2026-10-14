@@ -94,8 +94,14 @@ clone-github() {
 
 # === ALIASES ===
 # System shortcuts
-alias shutdown='pve shutdown 200'
-alias reboot='pve reboot 200'
+# Proxmox guest (qemu guest agent installed): power the VM through the host
+if command -v qemu-ga &>/dev/null; then
+    alias shutdown='pve shutdown 200'
+    alias reboot='pve reboot 200'
+else
+    alias shutdown='sudo shutdown now'
+    alias reboot='sudo reboot now'
+fi
 
 # Command improvements
 alias ls='ls --color=auto --group-directories-first'
