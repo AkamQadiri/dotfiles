@@ -70,7 +70,10 @@ esac
 
 # === SWITCH NOTIFICATION ===
 # Replace the previous notification so quick clicks do not stack
-[ -n "$profile_switched" ] && notify-send -a "power-profile" -h string:x-dunst-stack-tag:power-profile "Power profile" "$profile_label"
+if [ -n "$profile_switched" ]; then
+    notify-send -a "power-profile" -h string:x-dunst-stack-tag:power-profile \
+        "Power profile" "$profile_label"
+fi
 
 # === OUTPUT STATUS ===
 echo "$profile_icon"
