@@ -37,5 +37,9 @@ interval=3
 [battery]
 interval=3
 
+[do-not-disturb]
+interval=3
+markup=pango
+
 [clock]
 interval=1

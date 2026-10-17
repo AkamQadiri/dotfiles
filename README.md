@@ -37,6 +37,8 @@ The power profile block shows an icon for the active profile (leaf for power sav
 
 The brightness block shows the screen brightness. Scrolling changes it in 5% steps like the brightness keys, and left click sets full brightness.
 
+The do not disturb block shows a bell while notifications are shown and a dimmed crossed out bell while dunst holds them back. Left click toggles it, and held back notifications show up once it is turned off.
+
 ## Layout
 
 - `dotfiles/` — files that map into `$HOME` (configs, scripts, X startup)

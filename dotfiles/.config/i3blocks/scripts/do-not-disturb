@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# Do not disturb indicator
+# Shows whether notifications are held back, hidden when dunst is not running
+
+# === HELPER FUNCTIONS ===
+# Wrap text in Pango markup that dims it
+dim() {
+    echo "<span foreground='#6272A4'>$1</span>"
+}
+
+# === HANDLE MOUSE CLICKS ===
+# Button 1: Toggle do not disturb
+# Button 2: Edit this script
+case $BLOCK_BUTTON in
+1) dunstctl set-paused toggle ;;
+2) "$TERMINAL" -e "$EDITOR" "$0" ;;
+esac
+
+# === GET STATUS ===
+# Ask dunst over D-Bus directly, as dunstctl is a slower shell script, and exit
+# if dunst is not running (busctl prints it as: b true)
+paused=$(busctl --user get-property org.freedesktop.Notifications /org/freedesktop/Notifications \
+    org.dunstproject.cmd0 paused 2>/dev/null) || exit 0
+
+# === OUTPUT STATUS ===
+# Bell while notifications are shown, dimmed crossed out bell while held back
+if [ "$paused" = "b true" ]; then
+    dim ""
+else
+    echo ""
+fi
