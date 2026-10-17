@@ -1,0 +1,71 @@
+#!/bin/sh
+
+# Power profile indicator
+# Shows the active power profile, hidden when no profile daemon is available
+
+# === GET ACTIVE PROFILE ===
+# Talk to the daemon over D-Bus directly, the tlpctl and powerprofilesctl
+# wrappers are Python and take ~150ms to start. Both tlp-pd and
+# power-profiles-daemon serve this interface
+profile_dbus="org.freedesktop.UPower.PowerProfiles /org/freedesktop/UPower/PowerProfiles org.freedesktop.UPower.PowerProfiles"
+# shellcheck disable=SC2086
+profile=$(busctl get-property $profile_dbus ActiveProfile 2>/dev/null) || exit 0
+
+# Strip the D-Bus type prefix and quotes, e.g. s "balanced"
+profile=${profile#s \"}
+profile=${profile%\"}
+
+# === HANDLE MOUSE CLICKS ===
+# Button 1: Next profile
+# Button 2: Edit this script
+# Button 3: Previous profile
+case $BLOCK_BUTTON in
+1)
+    case $profile in
+    power-saver) next_profile="balanced" ;;
+    balanced) next_profile="performance" ;;
+    *) next_profile="power-saver" ;;
+    esac
+    ;;
+2) "$TERMINAL" -e "$EDITOR" "$0" ;;
+3)
+    case $profile in
+    performance) next_profile="balanced" ;;
+    balanced) next_profile="power-saver" ;;
+    *) next_profile="performance" ;;
+    esac
+    ;;
+esac
+
+# === SWITCH PROFILE ===
+# The daemon applies profiles in the background, so trust a successful set
+# instead of reading it back, and keep the current profile if the set fails
+# shellcheck disable=SC2086
+if [ -n "$next_profile" ] && busctl set-property $profile_dbus ActiveProfile s "$next_profile"; then
+    profile=$next_profile
+    profile_switched=1
+fi
+
+# === DETERMINE ICON AND LABEL ===
+# Select icon and label based on active profile
+case $profile in
+power-saver)
+    profile_icon=""
+    profile_label="Power saver"
+    ;;
+performance)
+    profile_icon=""
+    profile_label="Performance"
+    ;;
+*)
+    profile_icon=""
+    profile_label="Balanced"
+    ;;
+esac
+
+# === SWITCH NOTIFICATION ===
+# Replace the previous notification so quick clicks do not stack
+[ -n "$profile_switched" ] && notify-send -a "power-profile" -h string:x-dunst-stack-tag:power-profile "Power profile" "$profile_label"
+
+# === OUTPUT STATUS ===
+echo "$profile_icon"

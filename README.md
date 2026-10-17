@@ -33,6 +33,8 @@ The network block shows an Ethernet icon while a cable is connected, the WiFi ic
 
 When a Bluetooth adapter is present, an i3blocks block shows whether Bluetooth is on and how many devices are connected. Left click opens bluetui, right click turns Bluetooth on or off.
 
+The power profile block shows an icon for the active profile (leaf for power saver, scale for balanced, rocket for performance) when tlp-pd or power-profiles-daemon is running. Left click cycles to the next profile, right click to the previous one, and a notification names the new profile.
+
 ## Layout
 
 - `dotfiles/` — files that map into `$HOME` (configs, scripts, X startup)

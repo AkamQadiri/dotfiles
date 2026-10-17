@@ -27,6 +27,9 @@ markup=pango
 interval=once
 signal=1
 
+[power-profile]
+interval=3
+
 [battery]
 interval=3
 
