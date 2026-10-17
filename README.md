@@ -39,6 +39,8 @@ The brightness block shows the screen brightness. Scrolling changes it in 5% ste
 
 The do not disturb block shows a bell while notifications are shown and a dimmed crossed out bell while dunst holds them back. Left click toggles it, and held back notifications show up once it is turned off.
 
+Left click on the clock shows this month's calendar with today in bold.
+
 ## Layout
 
 - `dotfiles/` — files that map into `$HOME` (configs, scripts, X startup)

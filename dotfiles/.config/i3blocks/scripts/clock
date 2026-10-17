@@ -3,9 +3,18 @@
 # Clock indicator
 # Shows time and date
 
+# === HELPER FUNCTIONS ===
+# Print this month's calendar from Monday, without its title or blank lines,
+# with today in bold
+calendar() {
+    cal -m | sed -e '1d' -e '/^ *$/d' -e "s/\(^\| \)\($(date +%-d)\)\( \|$\)/\1<b>\2<\/b>\3/"
+}
+
 # === HANDLE MOUSE CLICKS ===
+# Button 1: Show calendar
 # Button 2: Edit this script
 case $BLOCK_BUTTON in
+1) notify-send -a "clock" -h string:x-dunst-stack-tag:clock "$(date "+%B %Y")" "$(calendar)" ;;
 2) "$TERMINAL" -e "$EDITOR" "$0" ;;
 esac
 
