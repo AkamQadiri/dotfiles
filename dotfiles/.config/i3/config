@@ -147,7 +147,8 @@ bindsym $mod+x move workspace to output next
 workspace $ws4 output DP-0
 
 # Application workspace assignment
-assign [class="Spotify"] $ws1
+# Spotify sets its class after the window appears, too late for assign
+for_window [class="Spotify"] move container to workspace number $ws1
 assign [class="discord"] $ws4
 
 # =============================================================================
