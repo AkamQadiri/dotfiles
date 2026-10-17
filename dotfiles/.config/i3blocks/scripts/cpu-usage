@@ -4,8 +4,10 @@
 # Shows current CPU usage percentage
 
 # === HANDLE MOUSE CLICKS ===
+# Button 1: Open process viewer
 # Button 2: Edit this script
 case $BLOCK_BUTTON in
+1) "$TERMINAL" -e "htop" ;;
 2) "$TERMINAL" -e "$EDITOR" "$0" ;;
 esac
 

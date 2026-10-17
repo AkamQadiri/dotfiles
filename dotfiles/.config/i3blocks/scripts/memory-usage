@@ -4,8 +4,10 @@
 # Shows used/total memory
 
 # === HANDLE MOUSE CLICKS ===
+# Button 1: Open process viewer sorted by memory use
 # Button 2: Edit this script
 case $BLOCK_BUTTON in
+1) "$TERMINAL" -e "htop" --sort-key PERCENT_MEM ;;
 2) "$TERMINAL" -e "$EDITOR" "$0" ;;
 esac
 
