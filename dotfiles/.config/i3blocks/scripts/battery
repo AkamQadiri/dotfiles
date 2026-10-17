@@ -3,13 +3,7 @@
 # Laptop battery indicator
 # Shows charge level and charging status, hidden when no battery is present
 
-# === HANDLE MOUSE CLICKS ===
-# Button 2: Edit this script
-case $BLOCK_BUTTON in
-2) "$TERMINAL" -e "$EDITOR" "$0" ;;
-esac
-
-# === GET BATTERY STATUS ===
+# === GET BATTERY ===
 # Use the first battery found
 for battery_path in /sys/class/power_supply/BAT*; do
     break
@@ -18,6 +12,33 @@ done
 # Exit if no battery is present
 [ -d "$battery_path" ] || exit 0
 
+# === HELPER FUNCTIONS ===
+# Print time left and power draw while charging or discharging, from UPower
+battery_details() {
+    upower -i "/org/freedesktop/UPower/devices/battery_${battery_path##*/}" | awk -F': +' '
+        $1 ~ /state$/ { state = $2 }
+        $1 ~ /energy-rate$/ { rate = $2 + 0 }
+        $1 ~ /time to empty$/ { time = $2 " left" }
+        $1 ~ /time to full$/ { time = $2 " until full" }
+        END {
+            if (!time) time = "Estimating time"
+            if (state == "discharging") printf "%s\nUsing %.1f W", time, rate
+            else if (state == "charging") printf "%s\nCharging at %.1f W", time, rate
+            else if (state == "fully-charged") print "Fully charged"
+            else print "Plugged in, not charging"
+        }'
+}
+
+# === HANDLE MOUSE CLICKS ===
+# Button 1: Show time left and power draw
+# Button 2: Edit this script
+case $BLOCK_BUTTON in
+1) notify-send -a "battery" -h string:x-dunst-stack-tag:battery "Battery" "$(battery_details)" ;;
+2) "$TERMINAL" -e "$EDITOR" "$0" ;;
+esac
+
+# === GET BATTERY STATUS ===
+# Read charge level and charging status
 battery=$(cat "$battery_path/capacity")
 battery_status=$(cat "$battery_path/status")
 
