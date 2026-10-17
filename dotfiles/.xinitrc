@@ -51,7 +51,7 @@ picom &
 unclutter &
 lxpolkit &
 dunst &
-xss-lock --transfer-sleep-lock -- i3lock --nofork --color 282A36 &
+xss-lock --transfer-sleep-lock -- lock-screen &
 udiskie &
 
 # Desktop setup

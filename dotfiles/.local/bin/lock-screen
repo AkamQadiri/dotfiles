@@ -1,0 +1,28 @@
+#!/bin/bash
+set -euo pipefail
+
+# Screen locker
+# Locks the screen with i3lock and holds back notifications while it is locked
+
+# === HOLD BACK NOTIFICATIONS ===
+# Notifications would show on top of the lock screen. Remember whether do not
+# disturb was already on, treating a missing dunst as on so it is left alone
+WAS_PAUSED=$(dunstctl is-paused 2>/dev/null || echo true)
+dunstctl set-paused true 2>/dev/null || true
+
+# === LOCK ===
+# i3lock releases the suspend delay lock from xss-lock once the screen is
+# locked, so close this script's copy to not hold up suspend
+i3lock --nofork --color 282A36 &
+LOCKER_PID=$!
+trap 'kill "${LOCKER_PID}" 2>/dev/null' TERM INT
+if [[ -n "${XSS_SLEEP_LOCK_FD:-}" ]]; then
+    exec {XSS_SLEEP_LOCK_FD}<&-
+fi
+wait "${LOCKER_PID}" || true
+
+# === RESTORE NOTIFICATIONS ===
+# Show held back notifications, unless do not disturb was on before locking
+if [[ "${WAS_PAUSED}" == "false" ]]; then
+    dunstctl set-paused false
+fi
