@@ -10,7 +10,8 @@
     width = (300, 600)
     height = (0, 300)
     origin = top-right
-    offset = (10,50)
+    # Line up with the window edges, below the bar and i3 gaps
+    offset = (15,44)
     scale = 0
     notification_limit = 0
     
