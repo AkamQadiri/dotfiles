@@ -35,6 +35,20 @@ sudo chown root:root -R "${STAGING_DIR}"
 sudo cp -a "${STAGING_DIR}/." /
 sudo rm -rf "${STAGING_DIR}"
 
+# === DESKTOP THEME ===
+# Apps that ask the desktop portal or GSettings instead of reading the GTK
+# settings files (libadwaita, Electron, browsers) get dark mode and Dracula too
+# GSettings only saves over a D-Bus session, so start one when there is none,
+# as in the archinstall chroot
+echo "Setting desktop theme preferences..."
+GSETTINGS=(gsettings)
+if [[ -z "${DBUS_SESSION_BUS_ADDRESS:-}" && ! -S "${XDG_RUNTIME_DIR:-}/bus" ]]; then
+    GSETTINGS=(dbus-run-session -- gsettings)
+fi
+"${GSETTINGS[@]}" set org.gnome.desktop.interface color-scheme prefer-dark
+"${GSETTINGS[@]}" set org.gnome.desktop.interface gtk-theme Dracula
+"${GSETTINGS[@]}" set org.gnome.desktop.interface icon-theme Dracula
+
 # === XDG USER DIRECTORIES ===
 echo "Creating XDG user directories..."
 if [[ -f "${HOME}/.config/user-dirs.dirs" ]]; then

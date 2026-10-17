@@ -21,7 +21,7 @@ Personal configuration for an Arch Linux desktop built around i3, themed with Dr
 | File manager   | nnn                                      |
 | Theme          | Dracula (GTK, Qt, terminal, app configs) |
 
-The GTK theme and icons come from the AUR packages `dracula-gtk-theme` and `dracula-icons-git` (installed by archinstall). `~/.config/gtk-4.0` imports the theme for GTK 4 and libadwaita apps, which only read it from there. Qt apps get matching colors and icons through qt5ct and qt6ct (installed by archinstall), which share one color scheme in `~/.config/qt5ct/colors`.
+The GTK theme and icons come from the AUR packages `dracula-gtk-theme` and `dracula-icons-git` (installed by archinstall). `~/.config/gtk-4.0` imports the theme for GTK 4 and libadwaita apps, which only read it from there. Qt apps get matching colors and icons through qt5ct and qt6ct (installed by archinstall), which share one color scheme in `~/.config/qt5ct/colors`. `install.sh` also sets dark mode, the theme and the icons in GSettings, for apps that ask the desktop portal or GSettings instead (libadwaita, Electron, browsers).
 
 Bar, workspace and notification icons come from Font Awesome 5 (`ttf-font-awesome-5`, installed by archinstall). `~/.config/fontconfig/fonts.conf` makes them use its solid style, which otherwise loses to the outline style for icons that have both.
 
