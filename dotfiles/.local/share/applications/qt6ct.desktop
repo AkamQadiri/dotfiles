@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Qt6 Settings
+Comment=Qt6 Configuration Tool
+Keywords=settings;desktop;qt;qtsettings;qt6;
+Icon=preferences-desktop-theme
+Exec=qt6ct
+Terminal=false
+Categories=Settings;DesktopSettings;Qt;
+NoDisplay=true

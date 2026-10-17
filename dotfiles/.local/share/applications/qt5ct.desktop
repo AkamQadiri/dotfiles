@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Qt5 Settings
+Comment=Qt5 Configuration Tool
+Keywords=settings;desktop;qt;qtsettings;qt5;
+Icon=preferences-desktop-theme
+Exec=qt5ct
+Terminal=false
+Categories=Settings;DesktopSettings;Qt;
+NoDisplay=true
