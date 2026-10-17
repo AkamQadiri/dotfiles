@@ -11,12 +11,21 @@ case $BLOCK_BUTTON in
 2) "$TERMINAL" -e "$EDITOR" "$0" ;;
 esac
 
+# === GET MEMORY USAGE ===
+# Read total and available memory in kB, stopping once both are found
+while read -r key value _; do
+    case $key in
+    MemTotal:) total=$value ;;
+    MemAvailable:)
+        available=$value
+        break
+        ;;
+    esac
+done </proc/meminfo
+
+# Convert to tenths of a GiB, rounded
+used=$((((total - available) * 10 + 524288) / 1048576))
+total=$(((total * 10 + 524288) / 1048576))
+
 # === OUTPUT MEMORY USAGE ===
-echo " $(awk '
-/^MemTotal:/ { total=$2 }
-/^MemAvailable:/ { available=$2 }
-END {
-    used=(total-available)/1024/1024
-    total_gb=total/1024/1024
-    printf " %.1fG/%.1fG\n", used, total_gb
-}' /proc/meminfo)"
+printf ' %s %d.%dG/%d.%dG\n' "" $((used / 10)) $((used % 10)) $((total / 10)) $((total % 10))
