@@ -27,7 +27,7 @@ Bar, workspace and notification icons come from Font Awesome 5 (`ttf-font-awesom
 
 Keyboard layout is Norwegian (`no`). Displays are set by `autorandr` at login and on monitor hotplug, from the profile saved for the connected monitors (`autorandr --save <name>`). With no matching profile, every screen gets its largest resolution at its highest refresh rate, side by side, with the largest screen as primary (`~/.config/autorandr/postswitch`). Workspaces 1 to 4 open on the primary screen and workspace 5 on the other one, such as a docked laptop's own screen. The screen blanks and locks after 10 minutes idle, and notifications are held back while it is locked (`~/.local/bin/lock-screen`).
 
-On a laptop, closing the lid suspends, then hibernates before the battery runs out. The battery charges only between 75% and 80% to extend its life (`sudo tlp fullcharge` charges to 100% once). The i3blocks battery block (with notifications below 15% and at 5%), the brightness block and the brightness keys only do anything on a laptop. The touchpad gets tap-to-click, natural scrolling and a flat acceleration profile, like the mouse.
+On a laptop, closing the lid suspends, then hibernates before the battery runs out. The battery charges only between 75% and 80% to extend its life. Right click on the battery block switches to a full charge until unplugged, and back. The i3blocks battery block (with notifications below 15% and at 5%), the brightness block and the brightness keys only do anything on a laptop. The touchpad gets tap-to-click, natural scrolling and a flat acceleration profile, like the mouse.
 
 USB drives are automounted by udiskie under `/run/media/$USER/`, with a notification on mount and unmount.
 
@@ -41,7 +41,7 @@ The brightness block shows the screen brightness. Scrolling changes it in 5% ste
 
 The do not disturb block shows a bell while notifications are shown and a dimmed crossed out bell while dunst holds them back. Left click toggles it, and held back notifications show up once it is turned off.
 
-Left click on the clock shows this month's calendar with today in bold, and on the battery block the time left and power draw. Left click on the CPU or memory block opens htop, sorted by CPU or memory use, and right click on the CPU block shows the CPU temperature.
+Left click on the clock shows this month's calendar with today in bold, and on the battery block the time left, power draw and charge limit. Left click on the CPU or memory block opens htop, sorted by CPU or memory use, and right click on the CPU block shows the CPU temperature.
 
 ## Layout
 

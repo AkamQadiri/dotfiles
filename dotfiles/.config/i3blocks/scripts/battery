@@ -13,7 +13,8 @@ done
 [ -d "$battery_path" ] || exit 0
 
 # === HELPER FUNCTIONS ===
-# Print time left and power draw while charging or discharging, from UPower
+# Print time left and power draw while charging or discharging, from UPower,
+# and the charge limit when the battery supports one
 battery_details() {
     upower -i "/org/freedesktop/UPower/devices/battery_${battery_path##*/}" | awk -F': +' '
         $1 ~ /state$/ { state = $2 }
@@ -24,17 +25,57 @@ battery_details() {
             if (!time) time = "Estimating time"
             if (state == "discharging") printf "%s\nUsing %.1f W", time, rate
             else if (state == "charging") printf "%s\nCharging at %.1f W", time, rate
-            else if (state == "fully-charged") print "Fully charged"
-            else print "Plugged in, not charging"
+            else if (state == "fully-charged") printf "Fully charged"
+            else printf "Plugged in, not charging"
         }'
+
+    if read -r charge_stop <"$battery_path/charge_control_end_threshold" 2>/dev/null; then
+        printf '\nCharge limit %s%%' "$charge_stop"
+    fi
+}
+
+# Print a charge threshold (START or STOP) from TLP's running configuration
+tlp_threshold() {
+    sed -n "s/^$1_CHARGE_THRESH_${battery_path##*/}=\"\([0-9]*\)\"$/\1/p" /run/tlp/run.conf 2>/dev/null
+}
+
+# Switch between the TLP charge limit and charging to 100%, which TLP undoes
+# once unplugged. The start threshold must stay below the end threshold, so it
+# is written last when raising the limit and first when lowering it
+toggle_full_charge() {
+    limit_start=$(tlp_threshold START)
+    limit_stop=$(tlp_threshold STOP)
+    read -r charge_stop <"$battery_path/charge_control_end_threshold" 2>/dev/null || charge_stop=""
+
+    if [ -z "$limit_start" ] || [ -z "$limit_stop" ] || [ -z "$charge_stop" ]; then
+        message="No charge limit set in TLP"
+    elif [ "$charge_stop" -lt 100 ]; then
+        if { echo 100 >"$battery_path/charge_control_end_threshold" &&
+            echo 0 >"$battery_path/charge_control_start_threshold"; } 2>/dev/null; then
+            message="Charging to 100% until unplugged"
+        else
+            message="Could not change the charge limit"
+        fi
+    else
+        if { echo "$limit_start" >"$battery_path/charge_control_start_threshold" &&
+            echo "$limit_stop" >"$battery_path/charge_control_end_threshold"; } 2>/dev/null; then
+            message="Charging between $limit_start% and $limit_stop%"
+        else
+            message="Could not change the charge limit"
+        fi
+    fi
+
+    notify-send -a "battery" -h string:x-dunst-stack-tag:battery "Battery" "$message"
 }
 
 # === HANDLE MOUSE CLICKS ===
-# Button 1: Show time left and power draw
+# Button 1: Show time left, power draw and charge limit
 # Button 2: Edit this script
+# Button 3: Toggle between the charge limit and a full charge
 case $BLOCK_BUTTON in
 1) notify-send -a "battery" -h string:x-dunst-stack-tag:battery "Battery" "$(battery_details)" ;;
 2) "$TERMINAL" -e "$EDITOR" "$0" ;;
+3) toggle_full_charge ;;
 esac
 
 # === GET BATTERY STATUS ===

@@ -1,0 +1,10 @@
+# Battery Charge Threshold Configuration
+# Let wheel users change the charge thresholds, so the i3blocks battery block can
+# switch between the TLP charge limit and a full charge without sudo
+
+ACTION=="add", \
+SUBSYSTEM=="power_supply", \
+KERNEL=="BAT*", \
+ATTR{charge_control_end_threshold}=="?*", \
+RUN+="/usr/bin/chgrp wheel /sys$devpath/charge_control_start_threshold /sys$devpath/charge_control_end_threshold", \
+RUN+="/usr/bin/chmod g+w /sys$devpath/charge_control_start_threshold /sys$devpath/charge_control_end_threshold"
