@@ -7,8 +7,11 @@
 # Print the active profile from tlp-pd or power-profiles-daemon, which share
 # this D-Bus interface (busctl prints it as: s "balanced")
 get_profile() {
-    busctl get-property org.freedesktop.UPower.PowerProfiles /org/freedesktop/UPower/PowerProfiles \
-        org.freedesktop.UPower.PowerProfiles ActiveProfile 2>/dev/null | cut -d '"' -f 2
+    active_profile=$(busctl get-property org.freedesktop.UPower.PowerProfiles \
+        /org/freedesktop/UPower/PowerProfiles org.freedesktop.UPower.PowerProfiles \
+        ActiveProfile 2>/dev/null) || return
+    active_profile=${active_profile#s \"}
+    echo "${active_profile%\"}"
 }
 
 # Switch to the given profile
