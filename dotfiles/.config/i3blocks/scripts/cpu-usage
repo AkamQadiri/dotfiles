@@ -32,28 +32,30 @@ case $BLOCK_BUTTON in
 esac
 
 # === GET CPU USAGE ===
-# Read CPU stats and calculate usage over a small interval
+# Read CPU stats and calculate usage since the previous update, kept in a state
+# file, instead of sleeping between two samples
+cpu_state="${XDG_RUNTIME_DIR:-/tmp}/cpu-usage"
 read -r _ user nice system idle iowait irq softirq steal _ </proc/stat
 
-# Calculate total and idle from first sample
-prevtotal=$((user + nice + system + idle + iowait + irq + softirq + steal))
-previdle=$idle
-
-# Small delay for second sample
-sleep 0.1
-
-# Read CPU stats again
-read -r _ user nice system idle iowait irq softirq steal _ </proc/stat
-
-# Calculate total and idle from second sample
+# Calculate total from current sample
 total=$((user + nice + system + idle + iowait + irq + softirq + steal))
+
+# Read previous sample, zero on the first update to show usage since boot
+prevtotal=0
+previdle=0
+[ -f "$cpu_state" ] && read -r prevtotal previdle cpu_usage <"$cpu_state"
 
 # Calculate differences
 totald=$((total - prevtotal))
 idled=$((idle - previdle))
 
-# Calculate CPU usage percentage
-cpu_usage=$((100 * (totald - idled) / totald))
+# Calculate CPU usage percentage, keeping the previous one when less than a
+# second of CPU time (100 ticks) passed since the last update, like a click
+# right after it, as such short samples are too noisy
+if [ "$totald" -ge 100 ]; then
+    cpu_usage=$((100 * (totald - idled) / totald))
+    echo "$total $idle $cpu_usage" >"$cpu_state"
+fi
 
 # === OUTPUT CPU USAGE ===
 echo " $cpu_usage%"
