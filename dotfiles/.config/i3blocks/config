@@ -27,6 +27,10 @@ markup=pango
 interval=once
 signal=1
 
+[brightness]
+interval=once
+signal=2
+
 [power-profile]
 interval=3
 

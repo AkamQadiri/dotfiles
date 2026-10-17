@@ -25,7 +25,7 @@ The GTK theme and icons come from the AUR packages `dracula-gtk-theme` and `drac
 
 Keyboard layout is Norwegian (`no`). Displays are set by `autorandr` at login and on monitor hotplug, from the profile saved for the connected monitors (`autorandr --save <name>`). With no matching profile, every screen gets its largest resolution at its highest refresh rate, side by side, with the largest screen as primary (`~/.config/autorandr/postswitch`). The screen blanks and locks after 10 minutes idle.
 
-On a laptop, closing the lid suspends, then hibernates before the battery runs out. The i3blocks battery block (with notifications below 15% and at 5%) and the brightness keys only do anything on a laptop. The touchpad gets tap-to-click, natural scrolling and a flat acceleration profile, like the mouse.
+On a laptop, closing the lid suspends, then hibernates before the battery runs out. The i3blocks battery block (with notifications below 15% and at 5%), the brightness block and the brightness keys only do anything on a laptop. The touchpad gets tap-to-click, natural scrolling and a flat acceleration profile, like the mouse.
 
 USB drives are automounted by udiskie under `/run/media/$USER/`, with a notification on mount and unmount.
 
@@ -34,6 +34,8 @@ The network block shows an Ethernet icon while a cable is connected, the WiFi ic
 When a Bluetooth adapter is present, an i3blocks block shows whether Bluetooth is on and how many devices are connected. Left click opens bluetui, right click turns Bluetooth on or off.
 
 The power profile block shows an icon for the active profile (leaf for power saver, scale for balanced, rocket for performance) when tlp-pd or power-profiles-daemon is running. Left click cycles to the next profile, right click to the previous one, and a notification names the new profile.
+
+The brightness block shows the screen brightness. Scrolling changes it in 5% steps like the brightness keys, and left click sets full brightness.
 
 ## Layout
 

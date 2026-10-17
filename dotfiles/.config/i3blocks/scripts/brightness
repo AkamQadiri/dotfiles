@@ -1,0 +1,34 @@
+#!/bin/sh
+
+# Screen brightness indicator
+# Shows backlight brightness, hidden when no backlight is present
+
+# === HANDLE MOUSE CLICKS ===
+# Button 1: Full brightness
+# Button 2: Edit this script
+# Scroll up: Increase brightness
+# Scroll down: Decrease brightness
+case $BLOCK_BUTTON in
+1) brightnessctl -q set 100% ;;
+2) "$TERMINAL" -e "$EDITOR" "$0" ;;
+4) brightnessctl -q set 5%+ ;;
+5) brightnessctl -q set 5%- ;;
+esac
+
+# === GET BRIGHTNESS ===
+# Use the first backlight found, like brightnessctl
+for backlight_path in /sys/class/backlight/*; do
+    break
+done
+
+# Exit if no backlight is present
+[ -d "$backlight_path" ] || exit 0
+
+read -r brightness <"$backlight_path/brightness"
+read -r max_brightness <"$backlight_path/max_brightness"
+
+# Round to the nearest percent
+brightness=$(((brightness * 100 + max_brightness / 2) / max_brightness))
+
+# === OUTPUT STATUS ===
+echo " $brightness%"
