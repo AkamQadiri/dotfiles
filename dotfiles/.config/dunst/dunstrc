@@ -23,7 +23,7 @@
     
     # === APPEARANCE ===
     # Transparency (requires compositor)
-    transparency = 15
+    transparency = 0
     
     # Separators
     separator_height = 1
