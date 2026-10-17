@@ -5,6 +5,8 @@ export XDG_CURRENT_DESKTOP=i3
 export XDG_SESSION_DESKTOP="${XDG_CURRENT_DESKTOP}"
 export XDG_SESSION_TYPE=x11
 export _JAVA_AWT_WM_NONREPARENTING=1
+# qt6ct also answers to qt5ct, so Qt 5 and Qt 6 apps both get the Dracula theme
+export QT_QPA_PLATFORMTHEME=qt5ct
 
 # === LOGGING SETUP ===
 XLOG_DIR="${HOME}/.local/share/xorg"
