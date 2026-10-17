@@ -113,17 +113,17 @@
 
 # === URGENCY SETTINGS ===
 [urgency_low]
-    background = "#282A36"
-    foreground = "#6272A4"
+    background = "#282a36"
+    foreground = "#6272a4"
     timeout = 10
 
 [urgency_normal]
-    background = "#282A36"
-    foreground = "#BD93F9"
+    background = "#282a36"
+    foreground = "#bd93f9"
     timeout = 10
 
 [urgency_critical]
-    background = "#FF5555"
-    foreground = "#F8F8F2"
-    frame_color = "#FF5555"
+    background = "#ff5555"
+    foreground = "#f8f8f2"
+    frame_color = "#ff5555"
     timeout = 0
