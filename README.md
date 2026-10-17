@@ -41,6 +41,8 @@ The brightness block shows the screen brightness. Scrolling changes it in 5% ste
 
 The do not disturb block shows a bell while notifications are shown and a dimmed crossed out bell while dunst holds them back. Left click toggles it, and held back notifications show up once it is turned off.
 
+Left click on a notification runs its action, or opens a rofi menu of its actions and links when it has several. Middle click closes it and right click closes all of them.
+
 Left click on the clock shows this month's calendar with today in bold, and on the battery block the time left, power draw and charge limit. Left click on the CPU or memory block opens htop, sorted by CPU or memory use, and right click on the CPU block shows the CPU temperature.
 
 ## Layout
