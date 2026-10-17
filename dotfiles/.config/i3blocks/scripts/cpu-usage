@@ -3,12 +3,32 @@
 # CPU usage indicator
 # Shows current CPU usage percentage
 
+# === HELPER FUNCTIONS ===
+# Print the CPU package temperature from the Intel or AMD sensor
+cpu_temperature() {
+    for hwmon_path in /sys/class/hwmon/hwmon*; do
+        read -r sensor <"$hwmon_path/name"
+        case $sensor in
+        coretemp | k10temp)
+            read -r temperature <"$hwmon_path/temp1_input"
+            echo "$((temperature / 1000))°C"
+            return
+            ;;
+        esac
+    done
+    echo "No CPU sensor found"
+}
+
 # === HANDLE MOUSE CLICKS ===
 # Button 1: Open process viewer
 # Button 2: Edit this script
+# Button 3: Show CPU temperature
 case $BLOCK_BUTTON in
 1) "$TERMINAL" -e "htop" ;;
 2) "$TERMINAL" -e "$EDITOR" "$0" ;;
+3)
+    notify-send -a "cpu-usage" -h string:x-dunst-stack-tag:cpu-usage "CPU temperature" "$(cpu_temperature)"
+    ;;
 esac
 
 # === GET CPU USAGE ===
