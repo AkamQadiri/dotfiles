@@ -66,6 +66,11 @@ bindsym XF86AudioPause exec playerctl play-pause
 bindsym XF86AudioNext exec playerctl next
 bindsym XF86AudioPrev exec playerctl previous
 
+# Notification controls
+bindsym $mod+n exec dunstctl close
+bindsym $mod+Shift+n exec dunstctl history-pop
+bindsym $mod+Shift+period exec dunstctl context
+
 # Application shortcuts
 bindsym $mod+Shift+Return exec i3-sensible-terminal
 bindsym $mod+Shift+c kill
