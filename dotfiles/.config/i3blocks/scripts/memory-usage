@@ -28,4 +28,4 @@ used=$((((total - available) * 10 + 524288) / 1048576))
 total=$(((total * 10 + 524288) / 1048576))
 
 # === OUTPUT MEMORY USAGE ===
-printf ' %s %d.%dG/%d.%dG\n' "" $((used / 10)) $((used % 10)) $((total / 10)) $((total % 10))
+printf '%s %d.%dG/%d.%dG\n' "" $((used / 10)) $((used % 10)) $((total / 10)) $((total % 10))
