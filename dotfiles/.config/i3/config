@@ -148,7 +148,7 @@ workspace $ws4 output DP-0
 
 # Application workspace assignment
 # Spotify sets its class after the window appears, too late for assign
-for_window [class="Spotify"] move container to workspace number $ws1
+for_window [class="Spotify"] move container to workspace number $ws4
 assign [class="discord"] $ws4
 
 # =============================================================================
