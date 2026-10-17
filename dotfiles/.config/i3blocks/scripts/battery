@@ -39,8 +39,8 @@ esac
 
 # === GET BATTERY STATUS ===
 # Read charge level and charging status
-battery=$(cat "$battery_path/capacity")
-battery_status=$(cat "$battery_path/status")
+read -r battery <"$battery_path/capacity"
+read -r battery_status <"$battery_path/status"
 
 # === DETERMINE ICON ===
 # Select appropriate battery icon based on status
