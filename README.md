@@ -23,7 +23,7 @@ Personal configuration for an Arch Linux desktop built around i3, themed with Dr
 
 The GTK theme and icons come from the AUR packages `dracula-gtk-theme` and `dracula-icons-git` (installed by archinstall). `~/.config/gtk-4.0` imports the theme for GTK 4 and libadwaita apps, which only read it from there.
 
-Keyboard layout is Norwegian (`no`). Displays are set by `autorandr` at login and on monitor hotplug, from the profile saved for the connected monitors (`autorandr --save <name>`). With no matching profile, every screen gets its largest resolution at its highest refresh rate, side by side, with the largest screen as primary (`~/.config/autorandr/postswitch`). The screen blanks and locks after 10 minutes idle.
+Keyboard layout is Norwegian (`no`). Displays are set by `autorandr` at login and on monitor hotplug, from the profile saved for the connected monitors (`autorandr --save <name>`). With no matching profile, every screen gets its largest resolution at its highest refresh rate, side by side, with the largest screen as primary (`~/.config/autorandr/postswitch`). Workspaces 1 to 4 open on the primary screen and workspace 5 on the other one, such as a docked laptop's own screen. The screen blanks and locks after 10 minutes idle.
 
 On a laptop, closing the lid suspends, then hibernates before the battery runs out. The i3blocks battery block (with notifications below 15% and at 5%), the brightness block and the brightness keys only do anything on a laptop. The touchpad gets tap-to-click, natural scrolling and a flat acceleration profile, like the mouse.
 
