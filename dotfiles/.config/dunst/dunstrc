@@ -96,7 +96,7 @@
     history_length = 20
     
     # === MISC ===
-    dmenu = /usr/bin/dmenu -p dunst:
+    dmenu = /usr/bin/rofi -dmenu -p dunst
     browser = /usr/bin/firefox
     
     # Always run rule-defined scripts
