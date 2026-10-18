@@ -49,7 +49,8 @@ export NNN_FCOLORS="D4DEB778E79F9F67D2E5E5D2"
 # nnn settings
 export NNN_BMS="d:~/downloads;D:~/documents;p:~/pictures;v:~/videos;c:~/.config"
 export NNN_PLUG='f:fzopen;z:fzcd;p:preview-tui'
-export NNN_FIFO='/tmp/nnn.fifo'
+# -a gives each instance its own FIFO, so every nnn gets its own preview
+export NNN_OPTS="a"
 export NNN_PREVIEWIMGPROG="chafa -c 256 -s 100x50"
 export NNN_TERMINAL="$TERMINAL"
 
