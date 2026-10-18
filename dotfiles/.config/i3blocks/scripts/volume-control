@@ -33,6 +33,12 @@ pactl_volume=$(pactl get-sink-volume @DEFAULT_SINK@)
 audio_muted=$(echo "$pactl_muted" | awk '$1=="Mute:" {print $2}')
 audio_volume=$(echo "$pactl_volume" | awk '$1=="Volume:" {print $5}' | sed 's/[^0-9]//g')
 
+# No output device, or PipeWire not running yet
+if [ -z "$audio_volume" ]; then
+    echo ""
+    exit 0
+fi
+
 # === DETERMINE ICON ===
 # Select appropriate volume icon based on level
 if [ "$audio_volume" -gt "70" ]; then
