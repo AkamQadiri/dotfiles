@@ -59,22 +59,34 @@ if [ -f /usr/share/nnn/quitcd/quitcd.bash_sh_zsh ]; then
 fi
 
 # === PATH ADDITIONS ===
-export PATH="${PATH}:${HOME}/.local/bin"
+# Append a directory unless PATH already has it, as nested shells (terminals
+# opened from X, subshells) inherit PATH and run this file again
+path_append() {
+    case ":${PATH}:" in
+    *":$1:"*) ;;
+    *) PATH="${PATH}:$1" ;;
+    esac
+}
+
+path_append "${HOME}/.local/bin"
 
 # Android development
 export ANDROID_HOME="${HOME}/Android/Sdk"
-export PATH="${PATH}:${ANDROID_HOME}/cmdline-tools/latest/bin"
-export PATH="${PATH}:${ANDROID_HOME}/emulator"
-export PATH="${PATH}:${ANDROID_HOME}/platform-tools"
+path_append "${ANDROID_HOME}/cmdline-tools/latest/bin"
+path_append "${ANDROID_HOME}/emulator"
+path_append "${ANDROID_HOME}/platform-tools"
 
 # Node.js tools
-export PATH="${PATH}:${HOME}/.yarn/bin"
-export PATH="${PATH}:${HOME}/.npm/bin"
+path_append "${HOME}/.yarn/bin"
+path_append "${HOME}/.npm/bin"
 
 # .NET SDK and tools
 export DOTNET_ROOT="${HOME}/.dotnet"
-export PATH="${PATH}:${DOTNET_ROOT}"
-export PATH="${PATH}:${DOTNET_ROOT}/tools"
+path_append "${DOTNET_ROOT}"
+path_append "${DOTNET_ROOT}/tools"
+
+export PATH
+unset -f path_append
 
 # === GIT REPOSITORY MANAGEMENT ===
 # Clone GitHub repository with fuzzy search and preview
