@@ -131,8 +131,7 @@ if command -v qemu-ga &>/dev/null; then
     alias shutdown='pve shutdown 200'
     alias reboot='pve reboot 200'
 else
-    alias shutdown='sudo shutdown now'
-    alias reboot='sudo reboot now'
+    alias shutdown='shutdown now'
 fi
 
 # Command improvements
