@@ -39,11 +39,13 @@ run() {
 
 # Delete a directory's contents, or list them under --dry-run, leaving the
 # directory itself in place. $1 is "sudo" for system dirs or "" for user dirs.
+# Any further arguments are find tests that pick what to delete.
 clean_dir() {
     local privilege="$1" dir="$2"
+    shift 2
     [[ -d "${dir}" ]] || return 0
 
-    local -a cmd=(find "${dir}" -mindepth 1)
+    local -a cmd=(find "${dir}" -mindepth 1 "$@")
     if [[ "${DRY_RUN}" != true ]]; then
         cmd+=(-delete)
     fi
@@ -130,7 +132,6 @@ USER_DIRECTORIES=(
     "${HOME}/.local/state/git"
     "${HOME}/.local/state/mpv"
     "${HOME}/.local/state/wireplumber"
-    "${HOME}/.local/state/nvim"
 
     # Development
     "${HOME}/.npm/_cacache"
@@ -159,6 +160,11 @@ echo "Cleaning user directories..."
 for dir in "${USER_DIRECTORIES[@]}"; do
     clean_dir "" "${dir}"
 done
+
+# Neovim state, keeping the persistent undo history (undodir in options.lua)
+NVIM_STATE="${HOME}/.local/state/nvim"
+clean_dir "" "${NVIM_STATE}" \
+    ! -path "${NVIM_STATE}/undodir" ! -path "${NVIM_STATE}/undodir/*"
 
 # === HISTORY CLEANUP ===
 echo "Clearing shell and REPL history..."
