@@ -24,8 +24,11 @@ set_permissions() {
 }
 
 # === USER CONFIGURATION ===
+# Copy the entries, not the directory itself, so $HOME keeps its own mode
 echo "Installing user dotfiles..."
-cp -a "${DOTFILES_DIR}/." "${HOME}/"
+shopt -s dotglob
+cp -a "${DOTFILES_DIR}"/* "${HOME}/"
+shopt -u dotglob
 
 # === SYSTEM FILES INSTALLATION ===
 # Install from a root-owned copy so the repository is never modified
