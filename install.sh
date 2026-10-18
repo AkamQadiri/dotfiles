@@ -11,8 +11,10 @@ if [[ "$(id -u)" -eq 0 ]]; then
 fi
 
 # === CONFIGURATION ===
-DOTFILES_DIR="${PWD}/dotfiles"
-SYSTEM_DIR="${PWD}/system"
+# Relative to this script, so it works from any directory
+REPO_DIR=$(dirname "$(realpath "${BASH_SOURCE[0]}")")
+DOTFILES_DIR="${REPO_DIR}/dotfiles"
+SYSTEM_DIR="${REPO_DIR}/system"
 
 # === FUNCTIONS ===
 set_permissions() {
