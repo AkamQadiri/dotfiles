@@ -25,7 +25,7 @@ cpu_temperature() {
 # Button 2: Edit this script
 # Button 3: Show CPU temperature
 case $BLOCK_BUTTON in
-1) setsid -f "$TERMINAL" -e "htop" >/dev/null 2>&1 ;;
+1) setsid -f "$TERMINAL" -e "htop" --sort-key PERCENT_CPU >/dev/null 2>&1 ;;
 2) setsid -f "$TERMINAL" -e "$EDITOR" "$0" >/dev/null 2>&1 ;;
 3)
     notify-send -a "cpu-usage" -h string:x-dunst-stack-tag:cpu-usage "CPU temperature" "$(cpu_temperature)"
