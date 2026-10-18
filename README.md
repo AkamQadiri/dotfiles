@@ -51,7 +51,7 @@ Left click on the clock shows this month's calendar with today in bold, and on t
 - `system/` — files that map into `/` (X11 mouse/touchpad/keyboard config, logind lid switch, TLP Bluetooth exclusion and battery charge limit, udev rules)
 - `install.sh` — copies both trees into place and runs first-time setup
 
-`~/.local/bin` holds a few helper scripts: `backup-github`, `clean-system`, `pack-project`, `pve` (Proxmox VM control), and `random-wallpaper`.
+`~/.local/bin` holds a few helper scripts: `backup-github`, `clean-system`, `pve` (Proxmox VM control), and `random-wallpaper`.
 
 ## Install
 
