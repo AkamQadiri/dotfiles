@@ -12,6 +12,30 @@ GITHUB_USER=$(gh api user --jq .login 2>/dev/null) || {
     exit 1
 }
 
+# === BACKUP DRIVE ===
+# Offer every filesystem that isn't part of the running system: not an EFI
+# partition, and either unmounted or mounted where removable drives go
+mapfile -t DRIVES < <(lsblk -Jpo NAME,SIZE,FSTYPE,LABEL,MOUNTPOINT,PARTTYPE | jq -r '
+    .. | objects
+    | select(.fstype != null and (.fstype | IN("swap", "crypto_LUKS", "LVM2_member", "linux_raid_member") | not))
+    | select(.parttype != "c12a7328-f81f-11d2-ba4b-00a0c93ec93b")
+    | select(.mountpoint == null or (.mountpoint | test("^/(run/media|media|mnt)/")))
+    | "\(.name)  \(.size)  \(.fstype)  \(.label // "no label")  \(.mountpoint // "not mounted")"')
+
+if [[ ${#DRIVES[@]} -eq 0 ]]; then
+    echo "Error: No backup drive found (plug one in and try again)"
+    exit 1
+fi
+
+echo "Choose the backup drive:"
+PS3="Drive number: "
+select drive in "${DRIVES[@]}"; do
+    [[ -n "${drive}" ]] && break
+    echo "Invalid choice"
+done
+[[ -n "${drive:-}" ]] || exit 1
+BACKUP_DRIVE="${drive%% *}"
+
 # === FETCH REPOSITORIES ===
 echo "Fetching repository list for ${GITHUB_USER}..."
 GITHUB_REPOS=$(gh api --paginate /user/repos --jq '.[].full_name') || {
@@ -24,7 +48,6 @@ REPOS_DIR="/tmp/${GITHUB_USER}-repos"
 # No colons, so the archive can be written to FAT, exFAT and NTFS drives
 BACKUP_DATE=$(date +"%Y-%m-%dT%H%M%S%z")
 ARCHIVE_NAME="${GITHUB_USER}-repos-${BACKUP_DATE}.tar.gz"
-BACKUP_DRIVE="/dev/sdb"
 BACKUP_PATH="backup/github"
 
 # === MOUNT MANAGEMENT ===
