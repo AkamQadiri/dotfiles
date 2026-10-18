@@ -40,6 +40,15 @@ sudo chown root:root -R "${STAGING_DIR}"
 sudo cp -a "${STAGING_DIR}/." /
 sudo rm -rf "${STAGING_DIR}"
 
+# === UDEV RULES ===
+# Apply the rules to the devices already present instead of at the next boot.
+# Skipped in the archinstall chroot, where udev isn't running
+if [[ -S /run/udev/control ]]; then
+    echo "Applying udev rules..."
+    sudo udevadm control --reload
+    sudo udevadm trigger --subsystem-match=power_supply --subsystem-match=video4linux
+fi
+
 # === DESKTOP THEME ===
 # Apps that ask the desktop portal or GSettings instead of reading the GTK
 # settings files (libadwaita, Electron, browsers) get dark mode and Dracula too
