@@ -44,15 +44,28 @@ GITHUB_REPOS=$(gh api --paginate /user/repos --jq '.[].full_name') || {
 }
 
 # === BACKUP CONFIGURATION ===
-REPOS_DIR="/tmp/${GITHUB_USER}-repos"
 # No colons, so the archive can be written to FAT, exFAT and NTFS drives
 BACKUP_DATE=$(date +"%Y-%m-%dT%H%M%S%z")
 ARCHIVE_NAME="${GITHUB_USER}-repos-${BACKUP_DATE}.tar.gz"
 BACKUP_PATH="backup/github"
 
+# === CLEANUP ===
+# Runs on every exit, so a failure never leaves the clones or the mount behind
+REPOS_DIR=$(mktemp -d)
+SHOULD_UNMOUNT=false
+
+cleanup() {
+    rm -rf "${REPOS_DIR}"
+    if [[ "${SHOULD_UNMOUNT}" == "true" ]]; then
+        echo "Unmounting backup drive..."
+        udisksctl unmount -b "${BACKUP_DRIVE}" >/dev/null ||
+            echo "Warning: Failed to unmount ${BACKUP_DRIVE}"
+    fi
+}
+trap cleanup EXIT
+
 # === MOUNT MANAGEMENT ===
 BACKUP_MOUNTPOINT=$(findmnt -nr -o target -S "${BACKUP_DRIVE}" || true)
-SHOULD_UNMOUNT=false
 
 if [[ -z "${BACKUP_MOUNTPOINT}" ]]; then
     echo "Mounting backup drive..."
@@ -60,23 +73,21 @@ if [[ -z "${BACKUP_MOUNTPOINT}" ]]; then
         echo "Error: Failed to mount ${BACKUP_DRIVE}"
         exit 1
     }
-    BACKUP_MOUNTPOINT=$(findmnt -nr -o target -S "${BACKUP_DRIVE}")
     SHOULD_UNMOUNT=true
+    BACKUP_MOUNTPOINT=$(findmnt -nr -o target -S "${BACKUP_DRIVE}")
 fi
 
 BACKUP_DESTINATION="${BACKUP_MOUNTPOINT}/${BACKUP_PATH}"
 
 # === CLONE REPOSITORIES ===
-echo "Creating temporary directory..."
-rm -rf "${REPOS_DIR}"
-mkdir -p "${REPOS_DIR}"
-
 echo "Cloning repositories..."
+FAILED_REPOS=()
 while IFS= read -r repo; do
     echo "Cloning ${repo}..."
     # Bare: every branch and tag, without the working tree
     gh repo clone "${repo}" "${REPOS_DIR}/${repo}.git" --no-upstream -- --bare --quiet || {
         echo "Warning: Failed to clone ${repo}"
+        FAILED_REPOS+=("${repo}")
     }
 done <<<"${GITHUB_REPOS}"
 
@@ -87,16 +98,16 @@ tar -czf "${BACKUP_DESTINATION}/${ARCHIVE_NAME}" \
     -C "${REPOS_DIR}" . \
     --force-local || {
     echo "Error: Failed to create archive"
+    rm -f "${BACKUP_DESTINATION}/${ARCHIVE_NAME}"
     exit 1
 }
 
-# === CLEANUP ===
-echo "Cleaning up..."
-rm -rf "${REPOS_DIR}"
-
-if [[ "${SHOULD_UNMOUNT}" == "true" ]]; then
-    echo "Unmounting backup drive..."
-    udisksctl unmount -b "${BACKUP_DRIVE}" >/dev/null
+# A partial backup still beats none, but it must not look like a full one
+if [[ ${#FAILED_REPOS[@]} -gt 0 ]]; then
+    echo "Backup incomplete: ${BACKUP_DESTINATION}/${ARCHIVE_NAME}"
+    echo "Missing ${#FAILED_REPOS[@]} repositories:"
+    printf '  %s\n' "${FAILED_REPOS[@]}"
+    exit 1
 fi
 
 echo "Backup complete: ${BACKUP_DESTINATION}/${ARCHIVE_NAME}"
