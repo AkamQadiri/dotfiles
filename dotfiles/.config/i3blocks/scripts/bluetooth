@@ -43,12 +43,13 @@ toggle_bluetooth() {
 read -r powered connected < <(adapter_status)
 
 # === HANDLE MOUSE CLICKS ===
+# Programs run detached, as i3blocks ignores the block until a click finishes
 # Button 1: Open Bluetooth manager
 # Button 2: Edit this script
 # Button 3: Toggle Bluetooth on/off
 case ${BLOCK_BUTTON} in
-1) "${TERMINAL}" -e "bluetui" ;;
-2) "${TERMINAL}" -e "${EDITOR}" "$0" ;;
+1) setsid -f "${TERMINAL}" -e "bluetui" >/dev/null 2>&1 ;;
+2) setsid -f "${TERMINAL}" -e "${EDITOR}" "$0" >/dev/null 2>&1 ;;
 3)
     toggle_bluetooth
     read -r powered connected < <(adapter_status)

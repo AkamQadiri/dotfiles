@@ -10,11 +10,12 @@ dim() {
 }
 
 # === HANDLE MOUSE CLICKS ===
+# Programs run detached, as i3blocks ignores the block until a click finishes
 # Button 1: Toggle do not disturb
 # Button 2: Edit this script
 case $BLOCK_BUTTON in
 1) dunstctl set-paused toggle ;;
-2) "$TERMINAL" -e "$EDITOR" "$0" ;;
+2) setsid -f "$TERMINAL" -e "$EDITOR" "$0" >/dev/null 2>&1 ;;
 esac
 
 # === GET STATUS ===

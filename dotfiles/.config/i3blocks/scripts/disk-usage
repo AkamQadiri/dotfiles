@@ -4,9 +4,10 @@
 # Shows used/total space on root partition
 
 # === HANDLE MOUSE CLICKS ===
+# Programs run detached, as i3blocks ignores the block until a click finishes
 # Button 2: Edit this script
 case $BLOCK_BUTTON in
-2) "$TERMINAL" -e "$EDITOR" "$0" ;;
+2) setsid -f "$TERMINAL" -e "$EDITOR" "$0" >/dev/null 2>&1 ;;
 esac
 
 # === OUTPUT DISK USAGE ===

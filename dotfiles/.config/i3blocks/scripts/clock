@@ -11,11 +11,12 @@ calendar() {
 }
 
 # === HANDLE MOUSE CLICKS ===
+# Programs run detached, as i3blocks ignores the block until a click finishes
 # Button 1: Show calendar
 # Button 2: Edit this script
 case ${BLOCK_BUTTON} in
 1) notify-send -a "clock" -h string:x-dunst-stack-tag:clock "$(printf '%(%B %Y)T')" "$(calendar)" ;;
-2) "${TERMINAL}" -e "${EDITOR}" "$0" ;;
+2) setsid -f "${TERMINAL}" -e "${EDITOR}" "$0" >/dev/null 2>&1 ;;
 esac
 
 # === OUTPUT TIME AND DATE ===
