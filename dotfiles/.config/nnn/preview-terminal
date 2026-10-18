@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# nnn preview terminal
+# preview-tui opens its preview window with this ($NNN_TERMINAL). The preview
+# opens beside nnn instead of as a new tab on top of it, and the focus stays on
+# nnn
+
+# === QUIET OUTPUT ===
+# Ghostty's logs and i3-msg's replies would otherwise draw over nnn
+exec >/dev/null 2>&1
+
+# === SPLIT ===
+# preview-tui sets NNN_SPLIT to h when nnn is taller than it is wide
+if [[ "${NNN_SPLIT:-}" == "h" ]]; then
+    i3-msg split vertical
+else
+    i3-msg split horizontal
+fi
+
+# === PREVIEW WINDOW ===
+NNN_WINDOW=$(xdotool getactivewindow)
+ghostty --class=nnn.preview "$@" &
+
+# === FOCUS ===
+# The i3 no_focus rule only covers the window appearing. Ghostty then asks for
+# the focus, which i3 grants, so give it back to nnn once that has happened
+for _ in {1..50}; do
+    sleep 0.1
+    [[ "$(xdotool getactivewindow)" != "${NNN_WINDOW}" ]] && break
+done
+i3-msg "[id=${NNN_WINDOW}] focus"

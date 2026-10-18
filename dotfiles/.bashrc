@@ -52,7 +52,8 @@ export NNN_PLUG='f:fzopen;z:fzcd;p:preview-tui'
 # -a gives each instance its own FIFO, so every nnn gets its own preview
 export NNN_OPTS="a"
 export NNN_PREVIEWIMGPROG="chafa -c 256 -s 100x50"
-export NNN_TERMINAL="$TERMINAL"
+# Opens the preview beside nnn and keeps the focus on nnn
+export NNN_TERMINAL="${HOME}/.config/nnn/preview-terminal"
 
 if [ -f /usr/share/nnn/quitcd/quitcd.bash_sh_zsh ]; then
     source /usr/share/nnn/quitcd/quitcd.bash_sh_zsh

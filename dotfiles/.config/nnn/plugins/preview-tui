@@ -239,7 +239,7 @@ EOF
         env "${ENVVARS[@]}" QUICKLOOK=1 "$0" "$1" &
     else
         # shellcheck disable=SC2086 # (allow arguments)
-        env "${ENVVARS[@]}" $NNN_TERMINAL --title="preview" --class="preview" -e "$0" "$1" >/dev/null 2>&1 &
+        env "${ENVVARS[@]}" $NNN_TERMINAL -e "$0" "$1" &
     fi ;;
     esac
 }

@@ -29,9 +29,12 @@ client.placeholder      #282a36   #282a36   #f8f8f2   #282a36   #282a36
 client.background       #f8f8f2
 
 # =============================================================================
-# FLOATING WINDOW RULES
+# WINDOW RULES
 # =============================================================================
 for_window [class="pavucontrol"] floating enable
+
+# The nnn preview leaves the focus on nnn (~/.config/nnn/preview-terminal)
+no_focus [class="^nnn\.preview$"]
 
 # =============================================================================
 # MOUSE SETTINGS
