@@ -53,11 +53,13 @@ fi
 # Apps that ask the desktop portal or GSettings instead of reading the GTK
 # settings files (libadwaita, Electron, browsers) get dark mode and Dracula too
 # GSettings only saves over a D-Bus session, so start one when there is none,
-# as in the archinstall chroot
+# as in the archinstall chroot.
+# There su keeps root's XDG_RUNTIME_DIR, which dconf can't write to, so drop it
+# and let dconf fall back to ~/.cache
 echo "Setting desktop theme preferences..."
 GSETTINGS=(gsettings)
 if [[ -z "${DBUS_SESSION_BUS_ADDRESS:-}" && ! -S "${XDG_RUNTIME_DIR:-}/bus" ]]; then
-    GSETTINGS=(dbus-run-session -- gsettings)
+    GSETTINGS=(env -u XDG_RUNTIME_DIR dbus-run-session -- gsettings)
 fi
 "${GSETTINGS[@]}" set org.gnome.desktop.interface color-scheme prefer-dark
 "${GSETTINGS[@]}" set org.gnome.desktop.interface gtk-theme Dracula
