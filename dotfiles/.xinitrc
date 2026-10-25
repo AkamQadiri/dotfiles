@@ -44,7 +44,8 @@ fi
 autorandr --change --default horizontal
 
 # === SCREEN BLANKING ===
-# Blank and lock (via xss-lock) after 10 minutes idle
+# Blank and lock (via xss-lock) after 10 minutes idle, held off by
+# stay-awake-media while audio is playing or a window is fullscreen
 xset s 600
 
 # === STARTUP APPLICATIONS ===
@@ -54,6 +55,7 @@ unclutter &
 lxpolkit &
 dunst &
 xss-lock --transfer-sleep-lock -- lock-screen &
+stay-awake-media &
 udiskie &
 
 # Desktop setup

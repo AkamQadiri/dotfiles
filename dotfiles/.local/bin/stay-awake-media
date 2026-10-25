@@ -1,0 +1,34 @@
+#!/bin/bash
+set -euo pipefail
+
+# Media keep-awake
+# Stops the screen from blanking and locking while audio is playing or a
+# window is fullscreen, such as a video in Firefox
+
+# === CONFIGURATION ===
+# Seconds between checks, well under the 10 minute blanking timeout
+CHECK_INTERVAL=60
+
+# === HELPER FUNCTIONS ===
+# An audio stream counts as playing when it is not corked (paused)
+audio_playing() {
+    pactl --format=json list sink-inputs 2>/dev/null |
+        jq --exit-status 'any(.[]; .corked == false)' >/dev/null
+}
+
+fullscreen_window() {
+    local window state
+    window=$(xdotool getactivewindow 2>/dev/null) || return 1
+    state=$(xprop -id "${window}" _NET_WM_STATE 2>/dev/null) || return 1
+    [[ "${state}" == *_NET_WM_STATE_FULLSCREEN* ]]
+}
+
+# === MAIN LOOP ===
+# Resetting the X screen saver also restarts the DPMS timers, so xss-lock
+# never sees the screen go idle
+while true; do
+    if audio_playing || fullscreen_window; then
+        xset s reset
+    fi
+    sleep "${CHECK_INTERVAL}"
+done
