@@ -31,6 +31,8 @@ On a laptop, closing the lid suspends, then hibernates before the battery runs o
 
 USB drives are automounted by udiskie under `/run/media/$USER/`, with a notification on mount and unmount.
 
+`Print` takes a screenshot with Flameshot, which captures through X11 directly, as no xdg-desktop-portal backend provides screenshots on i3 (`~/.config/flameshot/flameshot.ini`).
+
 GNOME Keyring runs as a single daemon from its systemd unit. `~/.local/share/dbus-1/services` makes D-Bus requests for it start that unit too, instead of a second daemon beside the one its control socket starts.
 
 Folders opened from other apps, such as udiskie, open in nnn. In nnn, `;p` opens a preview of the selected file beside nnn, or below it when nnn is taller than it is wide, and leaves the focus on nnn (`~/.config/nnn/preview-terminal`).
