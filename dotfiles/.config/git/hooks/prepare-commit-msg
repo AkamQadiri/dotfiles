@@ -16,15 +16,6 @@ log() {
     printf '%s [%s] %s\n' "$(date '+%F %T')" "${repo:-?}" "$*" >>"$log_file" 2>/dev/null || true
 }
 
-# Never override a repo's own hook: core.hooksPath routes every repo here, so
-# hand off to a repo-local hook when one exists. --git-common-dir finds the
-# shared hooks dir (worktree-safe); -ef stops us handing off to ourselves.
-local_hook="$(git rev-parse --git-common-dir 2>/dev/null)/hooks/prepare-commit-msg"
-if [ -x "$local_hook" ] && ! [ "$local_hook" -ef "$0" ]; then
-    log "handoff to repo hook: $local_hook"
-    exec "$local_hook" "$@"
-fi
-
 [ -n "$2" ] && {
     log "skip: message source ($2)"
     exit 0

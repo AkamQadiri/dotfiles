@@ -1,4 +1,6 @@
-# Point every repo at one hooks dir. This hides each repo's own .git/hooks;
-# only prepare-commit-msg hands off to a repo's own hook of the same name.
-[core]
-	hooksPath = ~/.config/git/hooks
+# Pre-fill commit messages in every repo. A config hook runs in addition to a
+# repo's own .git/hooks/prepare-commit-msg (git runs config hooks first), so
+# per-repo hooks such as Git LFS keep working.
+[hook "claude-commit-msg"]
+	command = ~/.config/git/hooks/prepare-commit-msg
+	event = prepare-commit-msg
