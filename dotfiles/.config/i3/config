@@ -33,6 +33,10 @@ client.background       #f8f8f2
 # =============================================================================
 for_window [class="pavucontrol"] floating enable
 
+# Flameshot places its capture window over the whole monitor itself, which
+# i3 only allows for floating windows
+for_window [class="flameshot"] floating enable
+
 # The nnn preview leaves the focus on nnn (~/.config/nnn/preview-terminal)
 no_focus [class="^nnn\.preview$"]
 
