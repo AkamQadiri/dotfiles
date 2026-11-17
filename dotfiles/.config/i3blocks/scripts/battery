@@ -29,7 +29,8 @@ battery_details() {
             else printf "Plugged in, not charging"
         }'
 
-    if read -r charge_stop <"$battery_path/charge_control_end_threshold" 2>/dev/null; then
+    # stderr is redirected first, as a failed open would otherwise still print
+    if read -r charge_stop 2>/dev/null <"$battery_path/charge_control_end_threshold"; then
         printf '\nCharge limit %s%%' "$charge_stop"
     fi
 }
@@ -45,7 +46,7 @@ tlp_threshold() {
 toggle_full_charge() {
     limit_start=$(tlp_threshold START)
     limit_stop=$(tlp_threshold STOP)
-    read -r charge_stop <"$battery_path/charge_control_end_threshold" 2>/dev/null || charge_stop=""
+    read -r charge_stop 2>/dev/null <"$battery_path/charge_control_end_threshold" || charge_stop=""
 
     if [ -z "$limit_start" ] || [ -z "$limit_stop" ] || [ -z "$charge_stop" ]; then
         message="No charge limit set in TLP"
