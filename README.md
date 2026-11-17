@@ -33,6 +33,8 @@ USB drives are automounted by udiskie under `/run/media/$USER/`, with a notifica
 
 `Print` takes a screenshot with Flameshot, which captures through X11 directly, as no xdg-desktop-portal backend provides screenshots on i3 (`~/.config/flameshot/flameshot.ini`).
 
+Desktop portal requests, such as file dialogs, go to the GTK backend. Its inhibit portal is turned off, as it needs a screen saver service that i3 doesn't have (`~/.config/xdg-desktop-portal/portals.conf`).
+
 GNOME Keyring runs as a single daemon from its systemd unit. `~/.local/share/dbus-1/services` makes D-Bus requests for it start that unit too, instead of a second daemon beside the one its control socket starts.
 
 Folders opened from other apps, such as udiskie, open in nnn. In nnn, `;p` opens a preview of the selected file beside nnn, or below it when nnn is taller than it is wide, and leaves the focus on nnn (`~/.config/nnn/preview-terminal`).
