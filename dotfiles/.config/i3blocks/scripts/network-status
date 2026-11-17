@@ -35,8 +35,10 @@ wifi_interface=""
 ethernet_up=false
 vpn_up=false
 for interface_path in /sys/class/net/*; do
-    read -r operstate <"${interface_path}/operstate"
-    read -r type <"${interface_path}/type"
+    # Skip an interface removed mid-loop, such as a Docker container's. stderr
+    # is redirected first, as a failed open would otherwise still print
+    read -r operstate 2>/dev/null <"${interface_path}/operstate" || continue
+    read -r type 2>/dev/null <"${interface_path}/type" || continue
 
     if [[ -e "${interface_path}/device" ]]; then
         if [[ -d "${interface_path}/wireless" ]]; then
